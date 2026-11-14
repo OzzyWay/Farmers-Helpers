@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Farmers Helpers</title>
+  <meta name="description" content="Type your farm's address to see NASA climate and soil data for your land, what to plant and when, and local help nearby.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="wrap top-inner">
+      <a class="brand" href="/">🌱 Farmers Helpers</a>
+      <span class="tag">NASA data + live search for your land</span>
+    </div>
+  </header>
+
+  <section class="hero" id="hero">
+    <div class="wrap">
+      <h1>What should I plant, and when?</h1>
+      <p class="lede">Type your farm or garden address. We pull NASA satellite climate and soil-moisture data, USDA soil maps, and local extension advice for that exact spot.</p>
+      <form id="search" class="search" autocomplete="off">
+        <label class="sr-only" for="address">Farm address</label>
+        <input id="address" name="address" placeholder="e.g. County Rd 2300, Lubbock County, TX" required maxlength="200">
+        <button type="submit" id="go">Analyze my land</button>
+      </form>
+      <div class="examples">Try:
+        <button type="button" class="ex">Lubbock County, TX</button>
+        <button type="button" class="ex">Ames, Iowa</button>
+        <button type="button" class="ex">Fresno County, CA</button>
+      </div>
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <main id="report" class="wrap report" hidden>
+    <div class="place-line">
+      <div>
+        <p class="eyebrow" id="place-county"></p>
+        <h2 id="place-name"></h2>
+        <p class="muted" id="place-addr"></p>
+      </div>
+      <p class="muted small" id="place-coords"></p>
+    </div>
+
+    <div class="stats" id="stats"></div>
+
+    <div class="grid-2">
+      <section class="card map-card">
+        <div class="card-head">
+          <h3>Your area</h3>
+          <span class="muted small">Switch layers with the stack icon on the map</span>
+        </div>
+        <div id="map"></div>
+        <div class="legend" id="legend">
+          <span><i class="dot home"></i>Your land</span>
+          <span><i class="dot ext"></i>Extension office</span>
+          <span><i class="dot supply"></i>Farm supply</span>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-head"><h3>What to do now</h3></div>
+        <div id="advice" class="advice"></div>
+      </section>
+    </div>
+
+    <section class="card">
+      <div class="card-head">
+        <h3>What to plant</h3>
+        <div class="tabs" role="tablist" id="crop-tabs">
+          <button role="tab" data-filter="now" aria-selected="true">Plant now</button>
+          <button role="tab" data-filter="soon">Coming up</button>
+          <button role="tab" data-filter="later">Later this year</button>
+          <button role="tab" data-filter="calendar">Calendar</button>
+        </div>
+      </div>
+      <div id="crops"></div>
+    </section>
+
+    <div class="grid-2">
+      <section class="card">
+        <div class="card-head"><h3>Your climate, month by month</h3><span class="muted small">NASA POWER, long-term average</span></div>
+        <div class="chart-box"><canvas id="climate-chart"></canvas></div>
+      </section>
+      <section class="card">
+        <div class="card-head"><h3>Your soil</h3><span class="muted small" id="soil-source"></span></div>
+        <div id="soil"></div>
+      </section>
+    </div>
+
+    <section class="card web">
+      <div class="card-head">
+        <h3>Local help & news</h3>
+        <span class="pill">Found live with SerpApi</span>
+      </div>
+      <div class="grid-3">
+        <div><h4>Extension planting guides</h4><ul id="guides" class="links"></ul></div>
+        <div><h4>Nearby help</h4><ul id="local" class="links"></ul></div>
+        <div><h4>Farm news near you</h4><ul id="news" class="links"></ul></div>
+      </div>
+    </section>
+
+    <p class="fine" id="warnings"></p>
+    <p class="fine">
+      Planting windows are rules of thumb from NASA's 20+ year climate averages for your coordinates, not a guarantee.
+      Check the extension guides above for your county before buying seed.
+      Data: <a href="https://power.larc.nasa.gov/" target="_blank" rel="noopener">NASA POWER</a>,
+      <a href="https://gibs.earthdata.nasa.gov/" target="_blank" rel="noopener">NASA GIBS</a>,
+      <a href="https://sdmdataaccess.sc.egov.usda.gov/" target="_blank" rel="noopener">USDA NRCS Soil Data Access</a>,
+      <a href="https://soilgrids.org/" target="_blank" rel="noopener">ISRIC SoilGrids</a>,
+      search by <a href="https://serpapi.com/" target="_blank" rel="noopener">SerpApi</a>.
+    </p>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
