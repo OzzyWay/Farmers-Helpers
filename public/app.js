@@ -4,7 +4,277 @@ const $ = (sel) => document.querySelector(sel);
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const thisMonth = new Date().getMonth();
 
-let map, layerControl, markers, climateChart, report, cropFilter = "now";
+let map, layerControl, markers, texasMap, texasRegionsLayer, regionMarkers, selectedTexasRegion, climateChart, report, cropFilter = "now";
+
+const TEXAS_REGIONS = [
+  { id: "panhandle", name: "Panhandle", coords: [[36.5, -103.05], [36.5, -100], [34.55, -100], [34.55, -101.5], [35, -102.8]], status: "Dry watch", tone: "dry", temp: 82, rain: "0.7 in", moisture: 24, outlook: "Dry topsoil and steady winds raise irrigation demand. Check stored water before expanding acreage.", crops: ["Winter wheat", "Grain sorghum", "Corn"], lookup: "Armstrong County, TX", resources: [{ kind: "E", type: "extension", name: "County extension office", detail: "Crop and soil guidance", lat: 35.2, lon: -101.8 }, { kind: "W", type: "water", name: "Irrigation support", detail: "Water planning", lat: 35.4, lon: -101.3 }] },
+  { id: "trans-pecos", name: "Trans-Pecos", coords: [[32, -106.65], [32, -103.1], [30.5, -103.1], [29.5, -103.5], [28.7, -104.5], [29, -106.3], [31.8, -106.65]], status: "Very dry", tone: "dry", temp: 91, rain: "0.4 in", moisture: 18, outlook: "Very limited soil moisture. Prioritize livestock water checks and protect young plants from heat stress.", crops: ["Cotton", "Chiles", "Sorghum"], lookup: "Presidio County, TX", resources: [{ kind: "E", type: "extension", name: "Regional extension office", detail: "Range and crop advice", lat: 30.6, lon: -104.1 }, { kind: "S", type: "supply", name: "Farm and feed supply", detail: "Feed and equipment", lat: 30.9, lon: -103.7 }] },
+  { id: "high-plains", name: "High Plains", coords: [[34.55, -103.1], [34.55, -101.5], [33.5, -100], [32.5, -100], [32.4, -103.1]], status: "Dry watch", tone: "dry", temp: 86, rain: "1.1 in", moisture: 31, outlook: "Warm and on the dry side. Irrigation scheduling and wind protection are the main near-term priorities.", crops: ["Cotton", "Grain sorghum", "Winter wheat"], lookup: "Lubbock County, TX", resources: [{ kind: "E", type: "extension", name: "AgriLife Extension", detail: "Lubbock County crop guidance", lat: 33.58, lon: -101.85 }, { kind: "W", type: "water", name: "Irrigation support", detail: "Water-use planning", lat: 33.9, lon: -101.4 }, { kind: "S", type: "supply", name: "Farm supply", detail: "Seed and equipment", lat: 33.2, lon: -101.7 }] },
+  { id: "rolling-plains", name: "Rolling Plains", coords: [[34.55, -100], [34.55, -99], [33, -99], [31.5, -100.2], [32.4, -100.8], [33.5, -100]], status: "Watch", tone: "watch", temp: 84, rain: "1.8 in", moisture: 39, outlook: "Some stored moisture remains, but rainfall is uneven. Watch pasture recovery and early-season weeds.", crops: ["Wheat", "Cotton", "Forage sorghum"], lookup: "Haskell County, TX", resources: [{ kind: "E", type: "extension", name: "County extension office", detail: "Crop and range guidance", lat: 33.2, lon: -99.7 }, { kind: "S", type: "supply", name: "Feed and farm supply", detail: "Livestock and field supplies", lat: 32.8, lon: -99.4 }] },
+  { id: "north-texas", name: "North Texas", coords: [[36.5, -100], [36.5, -94.5], [33.5, -94.5], [33.5, -96], [33, -97], [33, -99], [34.55, -99]], status: "Fair", tone: "fair", temp: 80, rain: "2.6 in", moisture: 48, outlook: "Moderate moisture supports pasture and small grains. Watch for runoff after heavy showers on compacted ground.", crops: ["Wheat", "Hay", "Oats"], lookup: "Wichita County, TX", resources: [{ kind: "E", type: "extension", name: "AgriLife Extension", detail: "North Texas field guidance", lat: 33.9, lon: -98.5 }, { kind: "W", type: "water", name: "Water district office", detail: "Local water planning", lat: 34.2, lon: -97.9 }] },
+  { id: "east-texas", name: "East Texas", coords: [[33.5, -94.5], [33.5, -96], [32, -96], [31, -94.5], [31, -93.5], [33.5, -93.5]], status: "Steady", tone: "fair", temp: 79, rain: "3.4 in", moisture: 62, outlook: "Moisture is generally favorable. Maintain drainage on low ground and scout humid fields for disease pressure.", crops: ["Hay", "Corn", "Vegetables"], lookup: "Smith County, TX", resources: [{ kind: "E", type: "extension", name: "County extension office", detail: "Crop and livestock guidance", lat: 32.35, lon: -95.3 }, { kind: "S", type: "supply", name: "Farm supply", detail: "Seed and field inputs", lat: 32.6, lon: -94.9 }] },
+  { id: "central-texas", name: "Central Texas", coords: [[32.4, -100.8], [31.5, -100.2], [29.5, -99], [29, -97], [31, -96], [32, -96], [33, -97], [33, -99]], status: "Watch", tone: "watch", temp: 85, rain: "2.0 in", moisture: 42, outlook: "Conditions vary between valleys and uplands. Check soil moisture before planting and keep livestock shade available.", crops: ["Hay", "Corn", "Small grains"], lookup: "McLennan County, TX", resources: [{ kind: "E", type: "extension", name: "AgriLife Extension", detail: "Central Texas crop guidance", lat: 31.55, lon: -97.15 }, { kind: "W", type: "water", name: "Water planning office", detail: "Drought and water resources", lat: 30.9, lon: -98.1 }] },
+  { id: "south-texas", name: "South Texas", coords: [[29.5, -103.5], [29.5, -99], [27, -98], [25.84, -98.5], [25.84, -97], [29.5, -97], [29.5, -96], [31, -96], [31, -94.5], [29, -97], [29, -99]], status: "Dry watch", tone: "dry", temp: 90, rain: "1.0 in", moisture: 27, outlook: "Heat and limited rainfall can stress pasture and crops. Plan irrigation around establishment and check livestock water daily.", crops: ["Cotton", "Grain sorghum", "Forage"], lookup: "Webb County, TX", resources: [{ kind: "E", type: "extension", name: "County extension office", detail: "South Texas field guidance", lat: 27.5, lon: -99.5 }, { kind: "S", type: "supply", name: "Feed and farm supply", detail: "Livestock and equipment", lat: 27.3, lon: -99.2 }] },
+  { id: "gulf-coast", name: "Gulf Coast", coords: [[31, -97], [29.5, -96], [29.5, -93.5], [26, -93.5], [26, -97], [27, -98], [29.5, -99]], status: "Moist", tone: "fair", temp: 83, rain: "4.1 in", moisture: 68, outlook: "Moisture is comparatively high. Check drainage and field access after rain, and monitor warm-season disease pressure.", crops: ["Rice", "Hay", "Vegetables"], lookup: "Brazoria County, TX", resources: [{ kind: "E", type: "extension", name: "AgriLife Extension", detail: "Coastal crop guidance", lat: 29.2, lon: -95.4 }, { kind: "W", type: "water", name: "Water management office", detail: "Drainage and irrigation", lat: 29.1, lon: -95.1 }] },
+];
+
+function initTexasDesk() {
+  const usBounds = L.latLngBounds([24.3, -125], [49.5, -66.5]);
+  texasMap = L.map("texas-map", { center: [39.8, -98.5], zoom: 4, minZoom: 3, maxZoom: 13, maxBounds: usBounds, maxBoundsViscosity: 1, zoomControl: true });
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18, attribution: "© OpenStreetMap contributors" }).addTo(texasMap);
+  texasRegionsLayer = L.featureGroup().addTo(texasMap);
+  regionMarkers = L.layerGroup().addTo(texasMap);
+  const gpsLayer = L.layerGroup().addTo(texasMap);
+  const depthScene = $("#depth-scene");
+  const hero = $(".landing-hero");
+  const heroSun = $(".hero-sun");
+  const depthLabel = $("#depth-label");
+  const depthSteps = [...document.querySelectorAll(".depth-step")];
+  const grassColors = ["#8fc63d", "#64a82f", "#b1dc55", "#4c8d2d", "#d0eb72"];
+  const buildGrass = (host, className, count = 110) => {
+    if (!host) return null;
+    const grassField = document.createElement("div");
+    grassField.className = className;
+    grassField.setAttribute("aria-hidden", "true");
+    const blades = [];
+    for (let index = 0; index < count; index += 1) {
+      const blade = document.createElement("i");
+      const x = (index / Math.max(1, count - 1)) * 100 + ((index * 17) % 7) - 3.5;
+      const height = 26 + ((index * 29) % 50);
+      const lean = ((index * 23) % 17) - 8;
+      blade.className = "grass-blade";
+      blade.dataset.x = String(x);
+      blade.dataset.lean = String(lean);
+      blade.style.setProperty("--x", `${x}%`);
+      blade.style.setProperty("--height", `${height}%`);
+      blade.style.setProperty("--lean", `${lean}deg`);
+      blade.style.setProperty("--grass-color", grassColors[index % grassColors.length]);
+      grassField.appendChild(blade);
+      blades.push(blade);
+    }
+    host.appendChild(grassField);
+    host.addEventListener("pointerenter", () => host.classList.add("grass-hover"));
+    host.addEventListener("pointerleave", () => {
+      host.classList.remove("grass-hover");
+      host.style.removeProperty("--hover-x");
+      blades.forEach((blade) => { blade.style.transform = ""; });
+    });
+    host.addEventListener("pointermove", (event) => {
+      const bounds = host.getBoundingClientRect();
+      const x = ((event.clientX - bounds.left) / bounds.width) * 100;
+      const hoverX = Math.max(0, Math.min(100, x));
+      host.style.setProperty("--hover-x", `${hoverX.toFixed(1)}%`);
+      blades.forEach((blade) => {
+        const bladeX = Number(blade.dataset.x);
+        const influence = Math.max(0, 1 - Math.abs(hoverX - bladeX) / 24);
+        const bendAway = hoverX > bladeX ? -18 * influence : 18 * influence;
+        blade.style.transform = `rotate(${Number(blade.dataset.lean) + bendAway}deg)`;
+      });
+    });
+    return grassField;
+  };
+  buildGrass(depthScene?.querySelector(".depth-grass"), "grass-field");
+  buildGrass($(".landing-hero"), "hero-grass-field", 150);
+  let targetProgress = 0;
+  let displayedProgress = 0;
+  let depthFrame = 0;
+  const animateDepth = () => {
+    displayedProgress += (targetProgress - displayedProgress) * 0.14;
+    depthScene.style.setProperty("--depth-progress", displayedProgress.toFixed(4));
+    depthScene.style.setProperty("--depth-title-top", `${(6 + displayedProgress * 78).toFixed(2)}%`);
+    // The sun starts in the hero and sets toward the horizon as the soil story
+    // advances. It fades before the soil scene can cover the hero layer.
+    hero.style.setProperty("--sun-progress", displayedProgress.toFixed(4));
+    if (Math.abs(targetProgress - displayedProgress) > 0.001) {
+      depthFrame = requestAnimationFrame(animateDepth);
+    } else {
+      displayedProgress = targetProgress;
+      depthFrame = 0;
+    }
+  };
+  const updateDepthScene = () => {
+    const viewportCenter = window.innerHeight * 0.52;
+    const firstBounds = depthSteps[0].getBoundingClientRect();
+    const lastBounds = depthSteps[depthSteps.length - 1].getBoundingClientRect();
+    const firstCenter = firstBounds.top + firstBounds.height / 2;
+    const lastCenter = lastBounds.top + lastBounds.height / 2;
+    const travel = Math.max(1, lastCenter - firstCenter);
+    const progress = Math.max(0, Math.min(1, (viewportCenter - firstCenter) / travel));
+    targetProgress = progress;
+    if (!depthFrame) depthFrame = requestAnimationFrame(animateDepth);
+
+    const step = depthSteps.reduce((closest, candidate) => {
+      const bounds = candidate.getBoundingClientRect();
+      const center = bounds.top + bounds.height / 2;
+      return Math.abs(center - viewportCenter) < Math.abs(closest.center - viewportCenter)
+        ? { element: candidate, center }
+        : closest;
+    }, { element: depthSteps[0], center: depthSteps[0].getBoundingClientRect().top + depthSteps[0].getBoundingClientRect().height / 2 }).element;
+    depthScene.dataset.depth = step.dataset.depthStep;
+    depthLabel.textContent = step.dataset.label;
+    depthSteps.forEach((item) => item.classList.toggle("is-current", item === step));
+  };
+  window.addEventListener("scroll", updateDepthScene, { passive: true });
+  window.addEventListener("resize", updateDepthScene);
+  updateDepthScene();
+
+  for (const region of TEXAS_REGIONS) {
+    region.layer = L.polygon(region.coords, {
+      color: "#fbfaf6", weight: 2, fillColor: region.tone === "dry" ? "#aa956d" : region.tone === "watch" ? "#7b7651" : "#4e7455", fillOpacity: 0.38,
+    }).addTo(texasRegionsLayer);
+    region.layer.bindTooltip(region.name, { sticky: true, direction: "top" });
+    region.layer.on("click", () => selectTexasRegion(region));
+  }
+
+  $("#analyze-region").addEventListener("click", () => {
+    if (!selectedTexasRegion) return;
+    $("#address").value = selectedTexasRegion.lookup;
+    analyze(selectedTexasRegion.lookup);
+  });
+  $("#locate-farm").addEventListener("click", () => {
+    if (!navigator.geolocation) {
+      setStatus("Location is not available in this browser. Enter a U.S. address instead.", true);
+      return;
+    }
+    const button = $("#locate-farm");
+    button.disabled = true;
+    setStatus("Finding your location…");
+    navigator.geolocation.getCurrentPosition(({ coords }) => {
+      button.disabled = false;
+      const position = [coords.latitude, coords.longitude];
+      const region = TEXAS_REGIONS.find((item) => pointInRegion(position, item.coords));
+      if (!region) {
+        setStatus("Your location is outside the sample regions on this map. Search for a U.S. address instead.", true);
+        return;
+      }
+      gpsLayer.clearLayers();
+      L.circleMarker(position, { radius: 8, color: "#fff", weight: 3, fillColor: "#22231f", fillOpacity: 1 })
+        .bindPopup("Your device location").addTo(gpsLayer);
+      selectTexasRegion(region);
+      texasMap.setView(position, Math.max(texasMap.getZoom(), 8));
+      setStatus(`Showing your location in ${region.name}.`);
+    }, () => {
+      button.disabled = false;
+      setStatus("We couldn't access your location. Enter a U.S. address instead.", true);
+    }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 });
+  });
+  selectTexasRegion(TEXAS_REGIONS.find((region) => region.id === "high-plains"), false);
+
+  document.querySelectorAll("[data-begin]").forEach((button) => button.addEventListener("click", openDesk));
+  $("#header-begin").addEventListener("click", () => $("#desk").hidden ? openDesk() : openLanding());
+  $("#brand-home").addEventListener("click", (event) => { event.preventDefault(); openLanding(); });
+  $("#explore-soil").addEventListener("click", () => $("#soil-story").scrollIntoView({ behavior: "smooth" }));
+  $("#assistant-toggle").addEventListener("click", toggleAssistant);
+  $("#assistant-close").addEventListener("click", toggleAssistant);
+  $("#assistant-form").addEventListener("submit", sendAssistantMessage);
+}
+
+function pointInRegion(point, polygon) {
+  const [latitude, longitude] = point;
+  let inside = false;
+  for (let index = 0, previous = polygon.length - 1; index < polygon.length; previous = index++) {
+    const [currentLat, currentLon] = polygon[index];
+    const [previousLat, previousLon] = polygon[previous];
+    const crosses = (currentLat > latitude) !== (previousLat > latitude)
+      && longitude < ((previousLon - currentLon) * (latitude - currentLat)) / (previousLat - currentLat) + currentLon;
+    if (crosses) inside = !inside;
+  }
+  return inside;
+}
+
+function selectTexasRegion(region, zoom = true) {
+  selectedTexasRegion = region;
+  TEXAS_REGIONS.forEach((item) => item.layer.setStyle({
+    color: item === region ? "#24251f" : "#fbfaf6",
+    weight: item === region ? 3 : 1.5,
+    fillOpacity: item === region ? 0.68 : 0.3,
+  }));
+  if (zoom) texasMap.fitBounds(region.layer.getBounds(), { padding: [28, 28], maxZoom: 7 });
+  $("#region-kicker").textContent = "Regional demo snapshot";
+  $("#region-name").textContent = region.name;
+  $("#region-location").textContent = `${region.lookup} · illustrative conditions`;
+  $("#region-condition").textContent = region.status;
+  $("#region-condition").className = `condition-tag ${region.tone}`;
+  $("#region-outlook").textContent = region.outlook;
+  $("#region-crops").innerHTML = region.crops.map((crop) => `<span>${esc(crop)}</span>`).join("");
+
+  const metrics = [
+    { label: "Temperature", value: `${region.temp}°F`, foot: "sample" },
+    { label: "Rain · 30 days", value: region.rain, foot: "sample" },
+    { label: "Soil moisture", value: `${region.moisture}%`, foot: region.moisture < 30 ? "Low" : region.moisture > 60 ? "Good" : "Moderate", meter: region.moisture },
+  ];
+  $("#region-metrics").innerHTML = metrics.map((metric) => `
+    <div class="region-metric">
+      <span>${esc(metric.label)}</span><strong>${esc(metric.value)}</strong>
+      <small>${esc(metric.foot)}</small>
+      ${metric.meter != null ? `<i class="moisture-meter"><b style="width:${metric.meter}%"></b></i>` : ""}
+    </div>`).join("");
+
+  $("#region-resources").innerHTML = region.resources.map((resource) => `
+    <div class="resource-item">
+      <span class="resource-marker ${resource.type}">${resource.kind}</span>
+      <div><strong>${esc(resource.name)}</strong><span>${esc(resource.detail)}</span></div>
+    </div>`).join("");
+
+  regionMarkers.clearLayers();
+  region.resources.forEach((resource) => {
+    const icon = L.divIcon({ className: `map-resource ${resource.type}`, html: `<span>${esc(resource.kind)}</span>`, iconSize: [28, 28], iconAnchor: [14, 14] });
+    L.marker([resource.lat, resource.lon], { icon }).bindPopup(`<strong>${esc(resource.name)}</strong><br>${esc(resource.detail)}<br><small>Illustrative placement</small>`).addTo(regionMarkers);
+  });
+
+  if ($("#assistant").classList.contains("open")) addAssistantMessage(`Selected ${region.name}. Ask me about its sample moisture, crops, or field outlook.`, "bot");
+}
+
+function openDesk() {
+  $("#landing").hidden = true;
+  $("#desk").hidden = false;
+  $("#header-begin").textContent = "Back to home";
+  $("#assistant-toggle").hidden = false;
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  setTimeout(() => texasMap.invalidateSize(), 100);
+}
+
+function openLanding() {
+  $("#desk").hidden = true;
+  $("#landing").hidden = false;
+  $("#header-begin").textContent = "Open field desk ↗";
+  $("#assistant").hidden = true;
+  $("#assistant").classList.remove("open");
+  $("#assistant-toggle").hidden = true;
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function toggleAssistant() {
+  const panel = $("#assistant");
+  const opening = panel.hidden || !panel.classList.contains("open");
+  panel.hidden = !opening;
+  panel.classList.toggle("open", opening);
+  $("#assistant-toggle").setAttribute("aria-expanded", String(opening));
+  if (opening) $("#assistant-input").focus();
+}
+
+function addAssistantMessage(text, sender) {
+  const message = document.createElement("p");
+  message.className = `assistant-bubble ${sender}`;
+  message.textContent = text;
+  $("#assistant-messages").append(message);
+  $("#assistant-messages").scrollTop = $("#assistant-messages").scrollHeight;
+}
+
+function sendAssistantMessage(event) {
+  event.preventDefault();
+  const input = $("#assistant-input");
+  const question = input.value.trim();
+  if (!question || !selectedTexasRegion) return;
+  addAssistantMessage(question, "user");
+  const query = question.toLowerCase();
+  let answer = selectedTexasRegion.outlook;
+  if (/soil|moisture|water|rain|dry/.test(query)) answer = `${selectedTexasRegion.name} has an illustrative soil-moisture reading of ${selectedTexasRegion.moisture}% and ${selectedTexasRegion.rain} of sample rainfall over 30 days. These are demo values, not live readings.`;
+  else if (/crop|plant|grow|seed/.test(query)) answer = `The sample crop focus for ${selectedTexasRegion.name} is ${selectedTexasRegion.crops.join(", ")}. Use the address analysis for localized planting windows.`;
+  else if (/temperature|temp|hot|heat/.test(query)) answer = `The ${selectedTexasRegion.name} demo snapshot shows ${selectedTexasRegion.temp}°F. Treat it as illustrative, not a current forecast.`;
+  input.value = "";
+  addAssistantMessage(answer, "bot");
+}
 
 // ---------- helpers ----------
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -75,7 +345,7 @@ function renderPlace(loc) {
 function renderStats(d) {
   const c = d.climate, r = d.recent, s = d.soil || {};
   const stats = [];
-  stats.push({ label: `Average temp in ${MONTHS[thisMonth]}`, value: `${toF(c.temp_c[thisMonth])}°F`, sub: `${c.temp_c[thisMonth].toFixed(0)}°C · NASA 20+ yr average` });
+  stats.push({ label: `Average temp in ${MONTHS[thisMonth]}`, value: `${toF(c.temp_c[thisMonth])}°F`, sub: "NASA 20+ yr average" });
   if (r) {
     const normal = c.rain_mm[thisMonth];
     const pct = normal > 0 ? Math.round((r.rain_mm / normal) * 100) : null;
@@ -276,7 +546,7 @@ function renderClimate(c) {
       plugins: { legend: { labels: { color: ink, boxWidth: 12 } } },
       scales: {
         x: { ticks: { color: ink }, grid: { display: false } },
-        t: { position: "left", ticks: { color: ink, callback: (v) => `${v}°` }, grid: { color: line } },
+        t: { position: "left", ticks: { color: ink, callback: (v) => `${v}°F` }, grid: { color: line } },
         r: { position: "right", ticks: { color: ink, callback: (v) => `${v}"` }, grid: { display: false }, beginAtZero: true },
       },
     },
@@ -319,3 +589,5 @@ function renderWeb(w) {
   )).join("") || '<li class="muted">Nothing found nearby.</li>';
   $("#news").innerHTML = w.news.map((n) => item(n.link, n.title, [n.source, n.date].filter(Boolean).join(" · "))).join("") || '<li class="muted">No recent news found.</li>';
 }
+
+initTexasDesk();

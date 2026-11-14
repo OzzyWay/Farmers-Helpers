@@ -4,134 +4,202 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Farmers Helpers</title>
-  <meta name="description" content="Type your farm's address to see NASA climate and soil data for your land, what to plant and when, and local help nearby.">
+  <meta name="description" content="Explore U.S. field conditions, soil, crop guidance, and local farm support with Farmers Helpers.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=14">
 </head>
 <body>
-  <div class="alerts" id="alerts" role="region" aria-label="Weather alerts" aria-live="polite"></div>
-
   <header class="top">
     <div class="wrap top-inner">
-      <a class="brand" href="/">🌱 Farmers Helpers</a>
-      <span class="tag">NASA data + live search for your land</span>
+      <a class="brand" href="#home" id="brand-home"><span class="brand-mark" aria-hidden="true">FH</span>Farmers Helpers</a>
+      <button class="header-begin" id="header-begin" type="button">Open field desk <span aria-hidden="true">↗</span></button>
     </div>
   </header>
 
-  <section class="hero" id="hero">
-    <div class="wrap">
-      <h1>What should I plant, and when?</h1>
-      <p class="lede">Type your farm or garden address. We pull NASA satellite climate and soil-moisture data, USDA soil maps, and local extension advice for that exact spot.</p>
-      <form id="search" class="search" autocomplete="off">
-        <label class="sr-only" for="address">Farm address</label>
-        <input id="address" name="address" placeholder="e.g. County Rd 2300, Lubbock County, TX" required maxlength="200">
-        <button type="submit" id="go">Analyze my land</button>
-      </form>
-      <div class="examples">Try:
-        <button type="button" class="ex">Lubbock County, TX</button>
-        <button type="button" class="ex">Ames, Iowa</button>
-        <button type="button" class="ex">Fresno County, CA</button>
+  <main id="landing">
+    <section class="landing-hero" id="home">
+      <img class="hero-image" src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=2200&q=85" alt="Open green fields and grass beneath a wide U.S. sky">
+      <div class="hero-shade"></div>
+      <div class="hero-sun" aria-hidden="true"></div>
+      <div class="hero-copy">
+        <p class="hero-kicker"><span></span> U.S. ground, from grass to deep soil</p>
+        <p class="hero-lede">One address in. One field report out—with NASA climate, USDA soil, crop timing, and nearby farm support.</p>
+        <button class="begin-button" id="explore-soil" type="button">Go below the grass <span aria-hidden="true">↓</span></button>
       </div>
-      <p id="status" class="status" role="status" aria-live="polite"></p>
-    </div>
-  </section>
-
-  <main id="report" class="wrap report" hidden>
-    <div class="place-line">
-      <div>
-        <p class="eyebrow" id="place-county"></p>
-        <h2 id="place-name"></h2>
-        <p class="muted" id="place-addr"></p>
-      </div>
-      <p class="muted small" id="place-coords"></p>
-    </div>
-
-    <div class="stats" id="stats"></div>
-
-    <section class="card" id="forecast-card" hidden>
-      <div class="card-head">
-        <h3>Next 7 days</h3>
-        <div class="forecast-actions">
-          <button type="button" class="link-btn" id="show-alerts" hidden></button>
-          <a class="small" id="forecast-link" target="_blank" rel="noopener">National Weather Service forecast ↗</a>
-        </div>
-      </div>
-      <div class="forecast" id="forecast"></div>
+      <div class="hero-bottom"><span>01 / U.S. field guide</span><span>Scroll to descend</span></div>
     </section>
 
-    <div class="grid-2">
-      <section class="card map-card">
-        <div class="card-head">
-          <h3>Your area</h3>
-          <span class="muted small">Switch layers with the stack icon on the map</span>
+    <section class="soil-descent" id="soil-story">
+      <header class="descent-heading">
+        <p class="eyebrow">Below the grass line</p>
+        <p>Scroll through the same layers this repository turns into a practical field report.</p>
+      </header>
+      <div class="descent-grid">
+        <aside class="depth-scene" id="depth-scene" data-depth="grass" aria-label="Animated grass and soil depth illustration">
+          <h1 class="depth-title" id="depth-title">Farmers Helpers</h1>
+          <div class="depth-grass">
+            <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=75" alt="" loading="lazy">
+            <span>GRASS LINE</span>
+          </div>
+          <div class="depth-band band-topsoil"><span>TOPSOIL</span></div>
+          <div class="depth-band band-subsoil"><span>SUBSOIL</span></div>
+          <div class="depth-band band-parent"><span>PARENT MATERIAL</span></div>
+          <div class="depth-band band-bedrock"><span>BEDROCK</span></div>
+          <div class="depth-readout"><span>YOU ARE HERE</span><strong id="depth-label">Grass line</strong></div>
+        </aside>
+        <div class="depth-steps">
+          <article class="depth-step is-current" data-depth-step="grass" data-label="Grass line">
+            <span class="step-index">00 / GRASS LINE</span>
+            <h2>Start with one farm address.</h2>
+            <p>Search a U.S. farm, town, or county. Farmers Helpers geocodes the place and builds the report around its exact coordinates.</p>
+            <p class="step-voice"><b>Repository flow:</b> Address → location → field report.</p>
+          </article>
+          <article class="depth-step" data-depth-step="topsoil" data-label="Topsoil">
+            <span class="step-index">01 / TOPSOIL</span>
+            <h2>Read the soil your roots use.</h2>
+            <p>USDA Soil Data Access supplies soil series, pH, texture, drainage, organic matter, and water-holding context for the location.</p>
+            <p class="step-voice"><b>Repository flow:</b> USDA soil survey, with SoilGrids as a fallback.</p>
+          </article>
+          <article class="depth-step" data-depth-step="subsoil" data-label="Subsoil">
+            <span class="step-index">02 / SUBSOIL</span>
+            <h2>Track moisture and recent weather.</h2>
+            <p>NASA observations summarize recent rainfall, topsoil moisture, and the conditions that affect access, planting, and irrigation decisions.</p>
+            <p class="step-voice"><b>Repository flow:</b> NASA POWER and NASA soil-moisture data.</p>
+          </article>
+          <article class="depth-step" data-depth-step="parent" data-label="Parent material">
+            <span class="step-index">03 / PARENT MATERIAL</span>
+            <h2>Plan around the growing season.</h2>
+            <p>Long-term climate averages drive planting windows and crop recommendations, with reasons tied to temperature, water, and soil fit.</p>
+            <p class="step-voice"><b>Repository flow:</b> Crop rules turn climate into a next step.</p>
+          </article>
+          <article class="depth-step" data-depth-step="bedrock" data-label="Bedrock">
+            <span class="step-index">04 / BEDROCK</span>
+            <h2>Bring the local picture together.</h2>
+            <p>Finish with one report: maps, satellite layers, crop timing, extension guidance, nearby farm resources, and current agricultural news.</p>
+            <p class="step-voice"><b>Repository flow:</b> The Field Desk connects data to action.</p>
+          </article>
         </div>
-        <div id="map"></div>
-        <div class="legend" id="legend">
-          <span><i class="dot home"></i>Your land</span>
-          <span><i class="dot ext"></i>Extension office</span>
-          <span><i class="dot supply"></i>Farm supply</span>
-        </div>
-      </section>
-
-      <section class="card">
-        <div class="card-head"><h3>What to do now</h3></div>
-        <div id="advice" class="advice"></div>
-      </section>
-    </div>
-
-    <section class="card">
-      <div class="card-head">
-        <h3>What to plant</h3>
-        <div class="tabs" role="tablist" id="crop-tabs">
-          <button role="tab" data-filter="now" aria-selected="true">Plant now</button>
-          <button role="tab" data-filter="soon">Coming up</button>
-          <button role="tab" data-filter="later">Later this year</button>
-          <button role="tab" data-filter="calendar">Calendar</button>
-        </div>
-      </div>
-      <div id="crops"></div>
-    </section>
-
-    <div class="grid-2">
-      <section class="card">
-        <div class="card-head"><h3>Your climate, month by month</h3><span class="muted small">NASA POWER, long-term average</span></div>
-        <div class="chart-box"><canvas id="climate-chart"></canvas></div>
-      </section>
-      <section class="card">
-        <div class="card-head"><h3>Your soil</h3><span class="muted small" id="soil-source"></span></div>
-        <div id="soil"></div>
-      </section>
-    </div>
-
-    <section class="card web">
-      <div class="card-head">
-        <h3>Local help & news</h3>
-        <span class="pill">Found live with SerpApi</span>
-      </div>
-      <div class="grid-3">
-        <div><h4>Extension planting guides</h4><ul id="guides" class="links"></ul></div>
-        <div><h4>Nearby help</h4><ul id="local" class="links"></ul></div>
-        <div><h4>Farm news near you</h4><ul id="news" class="links"></ul></div>
       </div>
     </section>
 
-    <p class="fine" id="warnings"></p>
-    <p class="fine">
-      Planting windows are rules of thumb from NASA's 20+ year climate averages for your coordinates, not a guarantee.
-      Check the extension guides above for your county before buying seed.
-      Data: <a href="https://power.larc.nasa.gov/" target="_blank" rel="noopener">NASA POWER</a>,
-      <a href="https://gibs.earthdata.nasa.gov/" target="_blank" rel="noopener">NASA GIBS</a>,
-      <a href="https://sdmdataaccess.sc.egov.usda.gov/" target="_blank" rel="noopener">USDA NRCS Soil Data Access</a>,
-      <a href="https://soilgrids.org/" target="_blank" rel="noopener">ISRIC SoilGrids</a>,
-      search by <a href="https://serpapi.com/" target="_blank" rel="noopener">SerpApi</a>.
-    </p>
+    <section class="how-it-works">
+      <div class="how-leaves" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="how-intro">
+        <p class="eyebrow">How it works</p>
+        <h2>From one address<br>to a better field plan.</h2>
+      </div>
+      <div class="steps">
+        <article><span>01</span><h3>Locate the field</h3><p>SerpApi finds the coordinates, county, and state behind the address.</p><i class="card-bug bug-a" aria-hidden="true"></i><i class="card-bug bug-b" aria-hidden="true"></i></article>
+        <article><span>02</span><h3>Understand the ground</h3><p>NASA and USDA data explain climate, moisture, soil, and recent conditions.</p><i class="card-bug bug-a" aria-hidden="true"></i><i class="card-bug bug-b" aria-hidden="true"></i></article>
+        <article><span>03</span><h3>Plan the next move</h3><p>Crop recommendations, extension guides, farm supplies, and news finish the picture.</p><i class="card-bug bug-a" aria-hidden="true"></i><i class="card-bug bug-b" aria-hidden="true"></i></article>
+      </div>
+    </section>
+    <section class="try-it">
+      <div><p class="eyebrow">Your field is next</p><h2>One address. One report. Better decisions.</h2></div>
+      <button class="begin-button begin-button-dark" type="button" data-begin>Open the field desk <span aria-hidden="true">↗</span></button>
+    </section>
   </main>
+
+  <main id="desk" hidden>
+    <section class="desk wrap" id="texas-desk">
+      <div class="desk-heading">
+        <div><p class="eyebrow">U.S. field desk</p><h1>Conditions across the country</h1></div>
+        <span class="demo-tag"><i></i>Regional demo snapshot</span>
+      </div>
+      <form id="search" class="lookup" autocomplete="off">
+        <label class="sr-only" for="address">U.S. farm address</label>
+        <span class="lookup-mark" aria-hidden="true">⌖</span>
+        <input id="address" name="address" placeholder="Farm, town, or county anywhere in the U.S." required maxlength="200">
+        <button type="submit" id="go">Analyze address</button>
+      </form>
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+      <div class="desk-grid">
+        <section class="card texas-map-card" aria-labelledby="map-title">
+          <div class="card-head map-heading">
+            <div><p class="eyebrow">GPS map · U.S. coverage</p><h2 id="map-title">United States</h2></div>
+            <button type="button" id="locate-farm" class="locate-button" title="Use your device location">◎ <span>Use my location</span></button>
+          </div>
+          <div id="texas-map" role="application" aria-label="Zoomable map of U.S. agricultural regions"></div>
+          <div class="map-legend" aria-label="Map legend">
+            <span><i class="legend-pin extension">E</i>Extension</span>
+            <span><i class="legend-pin water">W</i>Water support</span>
+            <span><i class="legend-pin supply">S</i>Farm supply</span>
+          </div>
+          <p class="map-note">Street map by OpenStreetMap. Region conditions and sample support markers are illustrative.</p>
+        </section>
+        <aside class="card region-panel" aria-live="polite" aria-labelledby="region-name">
+          <div class="region-panel-head">
+            <div><p class="eyebrow" id="region-kicker">Selected region</p><h2 id="region-name"></h2></div>
+            <span class="condition-tag" id="region-condition"></span>
+          </div>
+          <p class="region-location" id="region-location"></p>
+          <div class="region-metrics" id="region-metrics"></div>
+          <section class="region-section"><h3>Field outlook</h3><p id="region-outlook"></p></section>
+          <section class="region-section"><h3>Crop focus</h3><div id="region-crops" class="crop-focus"></div></section>
+          <section class="region-section">
+            <div class="resource-heading"><h3>Nearby support</h3><span>Sample placements</span></div>
+            <div id="region-resources" class="resource-list"></div>
+          </section>
+          <button type="button" id="analyze-region" class="region-action">Analyze this region <span aria-hidden="true">→</span></button>
+        </aside>
+      </div>
+    </section>
+
+    <section id="report" class="wrap report" hidden>
+      <div class="place-line">
+        <div><p class="eyebrow" id="place-county"></p><h2 id="place-name"></h2><p class="muted" id="place-addr"></p></div>
+        <p class="muted small" id="place-coords"></p>
+      </div>
+      <div class="stats" id="stats"></div>
+      <div class="grid-2">
+        <section class="card map-card">
+          <div class="card-head"><h3>Your area</h3><span class="muted small">Switch layers with the stack icon on the map</span></div>
+          <div id="map"></div>
+          <div class="legend" id="legend"><span><i class="dot home"></i>Your land</span><span><i class="dot ext"></i>Extension office</span><span><i class="dot supply"></i>Farm supply</span></div>
+        </section>
+        <section class="card"><div class="card-head"><h3>What to do now</h3></div><div id="advice" class="advice"></div></section>
+      </div>
+      <section class="card">
+        <div class="card-head">
+          <h3>What to plant</h3>
+          <div class="tabs" role="tablist" id="crop-tabs">
+            <button role="tab" data-filter="now" aria-selected="true">Plant now</button>
+            <button role="tab" data-filter="soon">Coming up</button>
+            <button role="tab" data-filter="later">Later this year</button>
+            <button role="tab" data-filter="calendar">Calendar</button>
+          </div>
+        </div>
+        <div id="crops"></div>
+      </section>
+      <div class="grid-2">
+        <section class="card"><div class="card-head"><h3>Your climate, month by month</h3><span class="muted small">NASA POWER, long-term average</span></div><div class="chart-box"><canvas id="climate-chart"></canvas></div></section>
+        <section class="card"><div class="card-head"><h3>Your soil</h3><span class="muted small" id="soil-source"></span></div><div id="soil"></div></section>
+      </div>
+      <section class="card web">
+        <div class="card-head"><h3>Local help & news</h3><span class="pill">Found live with SerpApi</span></div>
+        <div class="grid-3">
+          <div><h4>Extension planting guides</h4><ul id="guides" class="links"></ul></div>
+          <div><h4>Nearby help</h4><ul id="local" class="links"></ul></div>
+          <div><h4>Farm news near you</h4><ul id="news" class="links"></ul></div>
+        </div>
+      </section>
+      <p class="fine" id="warnings"></p>
+      <p class="fine">Planting windows are rules of thumb from NASA's 20+ year climate averages for your coordinates, not a guarantee. Confirm with your county extension service. Data: <a href="https://power.larc.nasa.gov/" target="_blank" rel="noopener">NASA POWER</a>, <a href="https://gibs.earthdata.nasa.gov/" target="_blank" rel="noopener">NASA GIBS</a>, <a href="https://sdmdataaccess.sc.egov.usda.gov/" target="_blank" rel="noopener">USDA NRCS Soil Data Access</a>, <a href="https://soilgrids.org/" target="_blank" rel="noopener">ISRIC SoilGrids</a>, search by <a href="https://serpapi.com/" target="_blank" rel="noopener">SerpApi</a>.</p>
+    </section>
+  </main>
+
+  <aside class="assistant" id="assistant" hidden aria-label="Field assistant">
+    <div class="assistant-head"><div><span class="assistant-dot"></span><strong>Field assistant</strong></div><button type="button" id="assistant-close" aria-label="Close field assistant">×</button></div>
+    <div id="assistant-messages" class="assistant-messages" aria-live="polite"><p class="assistant-bubble">Ask about the selected U.S. region, its moisture, or crop focus.</p></div>
+    <form id="assistant-form" class="assistant-form"><label class="sr-only" for="assistant-input">Message the field assistant</label><input id="assistant-input" placeholder="Ask about this region…" autocomplete="off" required><button type="submit" aria-label="Send message">↑</button></form>
+  </aside>
+  <button type="button" id="assistant-toggle" class="assistant-toggle" aria-expanded="false" hidden><span aria-hidden="true">✳</span><span>Ask field helper</span></button>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-  <script src="app.js"></script>
+  <script src="app.js?v=13"></script>
 </body>
 </html>
