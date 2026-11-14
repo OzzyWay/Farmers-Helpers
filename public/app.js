@@ -53,6 +53,8 @@ function render(d) {
   $("#report").hidden = false;
   renderPlace(d.location);
   renderStats(d);
+  renderForecast(d.weather);
+  renderAlerts(d.weather?.alerts || []);
   renderMap(d);
   renderAdvice(d.advice);
   renderCrops();
@@ -93,6 +95,85 @@ function renderStats(d) {
       ${x.meter != null ? `<div class="meter"><i style="width:${Math.round(x.meter * 100)}%"></i></div>` : ""}
     </div>`).join("");
 }
+
+// ---------- weather forecast + alerts ----------
+const DISMISSED_KEY = "fh-dismissed-alerts";
+
+function dismissedIds() {
+  try { return new Set(JSON.parse(localStorage.getItem(DISMISSED_KEY) || "[]")); } catch { return new Set(); }
+}
+function saveDismissed(ids) {
+  try { localStorage.setItem(DISMISSED_KEY, JSON.stringify([...ids].slice(-200))); } catch { /* private mode: just don't remember */ }
+}
+
+function renderForecast(w) {
+  const card = $("#forecast-card");
+  card.hidden = !w;
+  if (!w) return;
+  $("#forecast-link").href = safeUrl(w.page);
+  // Pair each daytime period with the night after it (the first entry may be "Tonight" alone).
+  const days = [];
+  for (let i = 0; i < w.periods.length; i++) {
+    const p = w.periods[i];
+    if (p.is_day) {
+      const night = w.periods[i + 1] && !w.periods[i + 1].is_day ? w.periods[i + 1] : null;
+      days.push({ day: p, night });
+      if (night) i++;
+    } else {
+      days.push({ day: null, night: p });
+    }
+  }
+  const alertDays = new Set((w.alerts || []).map((a) => (a.until || "").slice(0, 10)));
+  $("#forecast").innerHTML = days.slice(0, 7).map(({ day, night }) => {
+    const main = day || night;
+    const label = !day ? night.name : /^(This Afternoon|This Morning|Today)$/.test(day.name) ? "Today" : day.name;
+    const rain = Math.max(day?.rain_pct || 0, night?.rain_pct || 0);
+    const lo = night?.temp_f;
+    const dates = [day?.start, night?.start].filter(Boolean).map((s) => s.slice(0, 10));
+    return `<div class="day ${dates.some((d) => alertDays.has(d)) ? "alerting" : ""}" title="${esc(main.detail || main.short)}">
+      <span class="name">${esc(label)}</span>
+      ${main.icon ? `<img src="${esc(safeUrl(main.icon))}" alt="">` : ""}
+      <span class="temps">${day ? `${day.temp_f}°` : ""}${lo != null ? ` <span class="lo ${lo <= 32 ? "freeze" : ""}">${day ? "/ " : ""}${lo}°</span>` : ""}</span>
+      <span class="short">${esc(main.short)}</span>
+      ${rain ? `<span class="rain">💧 ${rain}%</span>` : ""}
+    </div>`;
+  }).join("");
+}
+
+function renderAlerts(alerts, { showAll = false } = {}) {
+  const box = $("#alerts");
+  const dismissed = dismissedIds();
+  const visible = showAll ? alerts : alerts.filter((a) => !dismissed.has(a.id));
+  box.innerHTML = visible.map((a) => `
+    <div class="alert ${esc(a.level)}" data-id="${esc(a.id)}" role="alert">
+      <div class="kicker">${a.level === "danger" ? "⚠ Warning" : a.level === "warn" ? "⚠ Heads up" : "ℹ Note"} · ${esc(a.source)}</div>
+      <b>${esc(a.title)}</b>
+      <p>${esc(a.text)}</p>
+      ${a.detail ? `<details><summary>Full NWS details</summary><pre>${esc(a.detail)}</pre></details>` : ""}
+      <button class="close" type="button" aria-label="Close this alert" title="Close">×</button>
+    </div>`).join("");
+  box.querySelectorAll(".alert .close").forEach((btn) => btn.addEventListener("click", () => {
+    const el = btn.closest(".alert");
+    const ids = dismissedIds();
+    ids.add(el.dataset.id);
+    saveDismissed(ids);
+    el.classList.add("leaving");
+    // Remove after the slide-out; a timer (not animationend) so it also works with animations paused or off.
+    setTimeout(() => { el.remove(); updateShowAlerts(alerts); }, 200);
+  }));
+  updateShowAlerts(alerts);
+}
+
+function updateShowAlerts(alerts) {
+  const btn = $("#show-alerts");
+  const open = $("#alerts").children.length;
+  btn.hidden = !alerts.length || open === alerts.length;
+  btn.textContent = `⚠ Show ${alerts.length} weather alert${alerts.length === 1 ? "" : "s"}`;
+}
+
+$("#show-alerts").addEventListener("click", () => {
+  if (report?.weather) renderAlerts(report.weather.alerts, { showAll: true });
+});
 
 function nasaLayer(layer, date, ext, maxZoom) {
   return L.tileLayer(

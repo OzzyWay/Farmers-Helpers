@@ -123,7 +123,7 @@ def planting_guides(state, crops):
 
     try:
         found = trusted(_search({"engine": "duckduckgo", "kl": "us-en",
-                                 "q": f"{state} planting guide {crop_words} extension site:.edu"}, timeout=30))
+                                 "q": f"{state} planting guide {crop_words} extension site:.edu"}, timeout=12))
         if found:
             return found
     except SerpError:
