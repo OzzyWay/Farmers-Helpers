@@ -21,6 +21,7 @@ address ──► SerpApi (Google Maps) ──► lat/lon
               ├─► NASA POWER         monthly climate averages + last 30 days of weather & soil moisture
               ├─► USDA Soil Data Access (SoilGrids outside the US)   soil type, pH, texture, organic matter
               ├─► FCC Area API       county & state
+              ├─► National Weather Service   7-day forecast + active alerts (US only)
               ├─► SerpApi (Google Maps)   nearby extension offices + farm supply stores
               │
               ├─► recommend.py       planting windows per crop, soil + weather advice (with reasons)
@@ -28,6 +29,8 @@ address ──► SerpApi (Google Maps) ──► lat/lon
               ├─► SerpApi (DuckDuckGo → Google fallback)  the state's university extension planting guides (.edu only)
               └─► SerpApi (Google News)  current farm / drought news for the county, else the state
 ```
+
+**Weather alerts** pop up in the corner when a report loads: official NWS warnings for that spot, plus alerts the app derives from the next 3 days of forecast (frost/freeze, extreme heat, heavy rain or storms, wind too strong to spray), each with what to do. Closing one remembers it in the browser, and the forecast card has a button to show them again.
 
 The map uses OpenStreetMap plus three NASA GIBS satellite layers: true-color imagery, plant greenness (MODIS NDVI) and root-zone soil moisture (SMAP).
 
@@ -42,6 +45,7 @@ About 5 searches per new address (geocode, 2 nearby-place searches, guides, news
 | `server.py` | Web server: serves `public/` and `GET /api/analyze?address=…` |
 | `farmhelper/serp.py` | All SerpApi calls, with caching |
 | `farmhelper/nasa.py` | NASA POWER climate and recent daily data |
+| `farmhelper/weather.py` | NWS forecast, official alerts, and farm alerts derived from the forecast |
 | `farmhelper/soil.py` | USDA soil survey, with SoilGrids as fallback |
 | `farmhelper/recommend.py` | Crop list, planting-window rules, soil and weather advice |
 | `farmhelper/analyze.py` | Runs everything in parallel and builds the report |

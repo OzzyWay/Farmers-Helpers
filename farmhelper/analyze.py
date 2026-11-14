@@ -2,7 +2,7 @@
 
 from concurrent.futures import ThreadPoolExecutor
 
-from . import nasa, place, recommend, serp, soil
+from . import nasa, place, recommend, serp, soil, weather
 from .net import FetchError
 
 
@@ -31,12 +31,14 @@ def analyze(address):
         f_recent = _run(pool, nasa.recent, lat, lon)
         f_soil = _run(pool, soil.soil_at, lat, lon)
         f_local = _run(pool, serp.local_resources, lat, lon)
+        f_weather = _run(pool, weather.weather, lat, lon)
 
         area = _result(f_place, "County lookup", warnings) or {}
         climate = _result(f_climate, "NASA climate", warnings)
         recent = _result(f_recent, "NASA recent weather", warnings)
         soil_info = _result(f_soil, "Soil", warnings)
         local = _result(f_local, "Nearby places (SerpAPI)", warnings, [])
+        forecast = _result(f_weather, "Weather forecast (NWS)", warnings)
 
         if not climate:
             return {"error": "NASA POWER climate data is unavailable right now. Try again in a minute.", "warnings": warnings}
@@ -53,6 +55,7 @@ def analyze(address):
         "location": {**location, **area},
         "climate": climate,
         "recent": recent,
+        "weather": forecast,
         "soil": soil_info,
         "crops": plan,
         "advice": {
