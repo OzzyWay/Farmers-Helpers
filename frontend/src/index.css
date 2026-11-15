@@ -1043,6 +1043,7 @@ body { background: var(--bg); line-height: 1.5; }
   position: relative; min-height: 88vh; min-height: 88dvh;
   display: flex; align-items: flex-end;
   padding: 0 16px 56px;
+  overflow: hidden;
   color: #fffefa;
   background-color: #385943;
   background-image:
@@ -1050,7 +1051,7 @@ body { background: var(--bg); line-height: 1.5; }
     url("/images/hero-field.jpg");
   background-size: cover; background-position: center 60%;
 }
-.hero-inner { max-width: 1180px; width: 100%; margin: 0 auto; }
+.hero-inner { position: relative; z-index: 3; max-width: 1180px; width: 100%; margin: 0 auto; }
 .hero-kicker {
   display: inline-flex; align-items: center; gap: 10px; margin: 0 0 14px;
   text-transform: uppercase; letter-spacing: 0.14em; font-size: 0.75rem; font-weight: 700;
@@ -1061,7 +1062,13 @@ body { background: var(--bg); line-height: 1.5; }
 .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; }
 .hero-actions .btn-primary { background: #fffefa; border-color: #fffefa; color: #22231f; }
 .hero-actions .btn-primary:hover { background: #ece8dc; }
-.hero-credit { position: absolute; right: 14px; bottom: 10px; margin: 0; font-size: 11px; color: #e7e1d1; }
+.hero-credit { position: absolute; z-index: 3; right: 14px; bottom: 10px; margin: 0; font-size: 11px; color: #e7e1d1; }
+.hero-grass-field {
+  position: absolute; z-index: 2; right: 0; bottom: -1px; left: 0; height: 32%;
+  overflow: hidden; pointer-events: auto; filter: drop-shadow(0 -4px 8px rgb(36 66 20 / 35%));
+}
+.hero-grass-field .grass-blade { filter: saturate(1.2) brightness(1.12); }
+.hero-grass-field:hover .grass-blade { transition-duration: 120ms; }
 
 /* Depth story: sticky illustrated scene beside five steps. */
 .depth-story { background: var(--bg); }
