@@ -1012,6 +1012,11 @@ body { background: var(--bg); color: var(--ink); }
 }
 .depth-step:not(.is-current) { opacity: 0.08; }
 .depth-step.is-current { opacity: 1; }
+.depth-step[data-depth-step="grass"] { background: linear-gradient(135deg, rgba(63, 85, 58, 0.96), rgba(52, 69, 47, 0.92)); }
+.depth-step[data-depth-step="topsoil"] { background: linear-gradient(135deg, rgba(98, 72, 51, 0.96), rgba(82, 58, 43, 0.92)); }
+.depth-step[data-depth-step="subsoil"] { background: linear-gradient(135deg, rgba(80, 58, 43, 0.96), rgba(67, 49, 38, 0.92)); }
+.depth-step[data-depth-step="parent"] { background: linear-gradient(135deg, rgba(67, 49, 38, 0.96), rgba(54, 41, 32, 0.92)); }
+.depth-step[data-depth-step="bedrock"] { background: linear-gradient(135deg, rgba(49, 37, 30, 0.98), rgba(42, 37, 35, 0.94)); }
 .depth-step > p { max-width: 38ch; }
 .depth-step .step-voice { margin-bottom: 0; }
 
