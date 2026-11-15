@@ -7,20 +7,10 @@
     {
       "source": "/health",
       "destination": "https://farmers-helpers.onrender.com/health"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/assets/(.*)",
-      "dest": "/assets/$1"
     },
     {
-      "src": "/(.*\\.(js|css|ico|png|jpg|svg|woff2?))",
-      "dest": "/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/((?!api|health|assets|.*\\.).*)",
+      "destination": "/index.html"
     }
   ]
 }
