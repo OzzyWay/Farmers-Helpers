@@ -4,7 +4,6 @@ import FieldHelper from "../helper/FieldHelper.jsx";
 import ForecastCard from "../weather/ForecastCard.jsx";
 import { CalendarLegend } from "./CalendarStrip.jsx";
 import ClimateTrends from "./ClimateTrends.jsx";
-import DataLimitations from "./DataLimitations.jsx";
 import Findings from "./Findings.jsx";
 import PriorityPicker from "./PriorityPicker.jsx";
 import RuledOut from "./RuledOut.jsx";
@@ -151,8 +150,6 @@ export default function FieldSummary({ place, sectionRef, onSoilModelData, weath
             <RuledOut exclusions={data.exclusions} notSuggested={data.not_suggested} />
           </div>
         )}
-
-        <DataLimitations outlook={data?.outlook} />
       </div>
 
       {/* Floating "Ask about this field" chat: SerpApi answers, using this field's data above. */}
