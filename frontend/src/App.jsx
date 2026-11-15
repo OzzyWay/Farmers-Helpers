@@ -136,7 +136,7 @@ export default function App() {
         ref={mapSectionRef}
         tabIndex={-1}
         className="app"
-        style={{ "--sheet-h": `${narrow ? panel.height : 0}px` }}
+        style={{ "--sheet-h": `${narrow ? panel.height : 0}px`, "--topbar-h": `${topbar.height}px` }}
       >
         {location && (
           <TerrainMap lat={location.lat} lon={location.lon} onPick={pickOnMap} padding={padding} />
