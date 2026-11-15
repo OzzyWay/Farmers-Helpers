@@ -24,16 +24,18 @@ def analyze(address):
     if not location:
         return {"error": f"Couldn't find \"{address}\" on Google Maps. Try adding a city and state."}
     lat, lon = location["lat"], location["lon"]
+    try:
+        area = place.county_state(lat, lon) or {}
+    except FetchError:
+        return {"error": "We couldn't verify this location. Try a U.S. town, county, or farm address."}
 
     with ThreadPoolExecutor(max_workers=6) as pool:
-        f_place = _run(pool, place.county_state, lat, lon)
         f_climate = _run(pool, nasa.climate, lat, lon)
         f_recent = _run(pool, nasa.recent, lat, lon)
         f_soil = _run(pool, soil.soil_at, lat, lon)
         f_local = _run(pool, serp.local_resources, lat, lon)
         f_weather = _run(pool, weather.weather, lat, lon)
 
-        area = _result(f_place, "County lookup", warnings) or {}
         climate = _result(f_climate, "NASA climate", warnings)
         recent = _result(f_recent, "NASA recent weather", warnings)
         soil_info = _result(f_soil, "Soil", warnings)
