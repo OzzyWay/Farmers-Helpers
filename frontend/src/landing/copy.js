@@ -25,7 +25,7 @@ export const LINKS = {
 
 export const hero = {
   kicker: "Free field data for rural farms",
-  title: "Field Shift",
+  title: "Farmer Helper",
   lede:
     "For rural and independent farmers who may not have a crop advisor nearby. " +
     "Type one address and see your soil, your changing weather, and rotation ideas to talk over with your extension agent.",
