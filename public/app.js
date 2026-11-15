@@ -26,7 +26,6 @@ function initTexasDesk() {
   regionMarkers = L.layerGroup().addTo(texasMap);
   const gpsLayer = L.layerGroup().addTo(texasMap);
   const depthScene = $("#depth-scene");
-  const depthLabel = $("#depth-label");
   const depthSteps = [...document.querySelectorAll(".depth-step")];
   const grassColors = ["#8fc63d", "#64a82f", "#b1dc55", "#4c8d2d", "#d0eb72"];
   const buildGrass = (host, className, count = 110) => {
@@ -106,7 +105,6 @@ function initTexasDesk() {
         : closest;
     }, { element: depthSteps[0], center: depthSteps[0].getBoundingClientRect().top + depthSteps[0].getBoundingClientRect().height / 2 }).element;
     depthScene.dataset.depth = step.dataset.depthStep;
-    depthLabel.textContent = step.dataset.label;
     depthSteps.forEach((item) => item.classList.toggle("is-current", item === step));
   };
   window.addEventListener("scroll", updateDepthScene, { passive: true });
