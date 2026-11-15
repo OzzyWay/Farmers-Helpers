@@ -155,12 +155,10 @@ export default function FieldSummary({ place, sectionRef, onSoilModelData, weath
         <DataLimitations outlook={data?.outlook} />
       </div>
 
-      {/* Floating "Ask about this field" helper: fixed questions answered from the data above. */}
+      {/* Floating "Ask about this field" chat: SerpApi answers, using this field's data above. */}
       <FieldHelper
         place={place}
         rotation={data}
-        rotationState={data ? "ready" : rotation.status === "error" ? "error" : place ? "loading" : "idle"}
-        rotationError={rotation.error}
         weather={weather}
       />
 

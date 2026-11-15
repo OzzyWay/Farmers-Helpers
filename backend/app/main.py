@@ -9,6 +9,7 @@ from fastapi.responses import JSONResponse
 from fastapi.responses import Response
 import rasterio
 
+from app import chat as chat_service
 from app.cache import DiskCache
 from app.farm_data import gather_farm_data
 from app.geocode import GeocodeError, check_location, geocode
@@ -355,3 +356,32 @@ async def weather(
     """
     lat_f, lon_f = _location(lat, lon)
     return await gather_weather(client, lat_f, lon_f, cache)
+
+
+@app.get("/api/chat/status")
+def chat_status():
+    """Whether the SerpApi chat has a key, so the page can say so before anyone types."""
+    return {"ready": chat_service.key_configured()}
+
+
+@app.post("/api/chat")
+def chat_endpoint(payload: dict = Body(...)):
+    """'Ask about this field' chat, answered with SerpApi.
+
+    Body: {"message": str, "history": [{"role", "content"}], "place": {lat, lon, label}, "brief": str}
+    Returns {"reply": markdown, "sources": [{title, url, source}], "searches": [{kind, query}]}.
+    Errors: {"detail": "message for the farmer"} with 400 (bad question), 502 (search down)
+    or 503 (no SerpApi key yet).
+    """
+    if not isinstance(payload, dict):
+        raise HTTPException(status_code=400, detail="Send the question as JSON.")
+    place = payload.get("place") if isinstance(payload.get("place"), dict) else None
+    try:
+        return chat_service.chat(
+            str(payload.get("message") or ""),
+            payload.get("history") if isinstance(payload.get("history"), list) else [],
+            place,
+            str(payload.get("brief") or ""),
+        )
+    except chat_service.ChatError as e:
+        raise HTTPException(status_code=e.status, detail=str(e))

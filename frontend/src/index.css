@@ -1307,6 +1307,45 @@ body { background: var(--bg); line-height: 1.5; }
 }
 @media print { .helper-fab, .helper-panel { display: none; } }
 
+/* SerpApi chat inside the helper panel (src/helper/FieldHelper.jsx, Markdown.jsx) */
+.chat-panel { max-height: min(72vh, 680px); }
+.chat-welcome { display: flex; flex-direction: column; gap: 4px; }
+.chat-hello { margin: 0; font: 600 1.05rem var(--font-display); color: var(--green); }
+.chat-setup {
+  margin: 0; padding: 10px 12px; border-radius: 10px;
+  background: var(--warn-soft); color: var(--warn); font-size: 13px; font-weight: 500;
+}
+.chat-answer .chat-heading { font-weight: 700; margin-top: 4px; }
+.chat-answer ol { margin: 4px 0 8px; padding-left: 20px; }
+.chat-answer a { color: var(--green); font-weight: 600; }
+.chat-cite {
+  display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px;
+  margin: 0 1px; padding: 0 4px; border-radius: 9px; vertical-align: 1px;
+  background: var(--green-soft); color: var(--green) !important; font-size: 11px; text-decoration: none;
+}
+.chat-sources { margin-top: 6px; font-size: 12px; color: var(--muted); }
+.chat-sources summary { cursor: pointer; font-weight: 600; color: var(--green); min-height: 28px; display: flex; align-items: center; }
+.chat-sources ol { margin: 4px 0 0; padding-left: 18px; }
+.chat-sources li { margin: 3px 0; }
+.chat-source-site { color: var(--muted); }
+.chat-disclaimer { font-size: 12px; margin: 6px 0 0 !important; }
+.chat-error { background: var(--warn-soft); border-color: transparent; color: var(--error); margin: 0; }
+.chat-typing { display: flex; align-items: center; gap: 10px; margin: 0; color: var(--muted); }
+.chat-dots { display: inline-flex; gap: 4px; }
+.chat-dots span {
+  width: 7px; height: 7px; border-radius: 50%; background: var(--leaf);
+  animation: chat-bounce 1.2s infinite ease-in-out;
+}
+.chat-dots span:nth-child(2) { animation-delay: 0.15s; }
+.chat-dots span:nth-child(3) { animation-delay: 0.3s; }
+@keyframes chat-bounce { 0%, 80%, 100% { opacity: 0.3; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-3px); } }
+@media (prefers-reduced-motion: reduce) { .chat-dots span { animation: none; opacity: 0.7; } }
+.helper-chip:disabled { opacity: 0.5; cursor: wait; }
+.chat-more { font-size: 13px; min-height: 36px; }
+.helper-form input:disabled { opacity: 0.7; }
+.helper-form .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+@media (max-width: 767px) { .chat-panel { max-height: 80vh; } }
+
 /* NASA satellite water data (src/fieldSummary/WaterData.jsx) */
 .water-chart { height: 200px; }
 .water-facts { margin: 0; padding-left: 18px; font-size: 14px; }
