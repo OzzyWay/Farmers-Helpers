@@ -72,7 +72,6 @@ function initTexasDesk() {
     return grassField;
   };
   buildGrass(depthScene?.querySelector(".depth-grass"), "grass-field");
-  buildGrass($(".desk-top-grass"), "desk-top-grass-field", 120);
   buildGrass($(".landing-hero"), "hero-grass-field", 150);
   let targetProgress = 0;
   let displayedProgress = 0;
