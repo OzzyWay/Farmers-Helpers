@@ -208,7 +208,7 @@ body { background: var(--bg); color: var(--ink); }
 .top { position: relative; z-index: 20; background: var(--card); border-bottom-color: var(--line); }
 .top-inner { height: 66px; }
 .brand { display: inline-flex; align-items: center; gap: 10px; font-size: 1.18rem; }
-.brand-mark { display: grid; width: 30px; height: 30px; place-items: center; border-radius: 50%; background: var(--green); color: white; font: 700 0.9rem var(--body); }
+.brand-mark { display: block; width: 30px; height: 30px; flex: 0 0 auto; }
 .header-begin { padding: 9px 13px; border: 1px solid var(--line); border-radius: 4px; background: transparent; color: var(--ink); font: 600 0.82rem var(--body); cursor: pointer; }
 .header-begin:hover { background: var(--green-soft); }
 .landing-hero { position: relative; min-height: 690px; height: 77svh; max-height: 900px; overflow: hidden; background: #28372d; color: white; }
