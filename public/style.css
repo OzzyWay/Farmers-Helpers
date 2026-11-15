@@ -714,7 +714,7 @@ body { background: var(--bg); color: var(--ink); }
   min-height: 240px;
   padding: 68px max(24px, calc((100% - 1132px) / 2));
   overflow: hidden;
-  background: #202a22;
+  background: #5f7d49;
   color: #f5f2e9;
 }
 .try-it::before {
