@@ -95,6 +95,21 @@ try:
                 out.append(f"  {key}: {part['status']}" + (f" - {part.get('reason')}" if part["status"] != "ok" else ""))
             o = body["outlook"]
             out.append(f"  outlook: {o['status']}" + (f" ({o.get('origin')})" if o["status"] == "ok" else f" {o.get('reason', '')}"))
+            w = body.get("water") or {}
+            if w.get("status") == "ok":
+                parts = []
+                for p in ("rain", "groundwater", "root_zone", "surface"):
+                    part = w.get(p) or {}
+                    if part.get("status") != "ok":
+                        parts.append(f"{p} UNAVAILABLE ({part.get('reason')})")
+                    elif p == "rain":
+                        parts.append(f"rain ok {part.get('period')}, recent {part.get('recent_avg')} mm/yr")
+                    else:
+                        parts.append(f"{p} ok latest {part['latest']['pct']} ({part['latest']['date']}), "
+                                     f"12-month avg {part.get('last_12m_avg')}")
+                out.append(f"  water ({w.get('live_or_cached')}): " + "; ".join(parts))
+            else:
+                out.append(f"  water: UNAVAILABLE - {w.get('reason')}")
             if body.get("engine_error"):
                 out.append(f"  ENGINE ERROR: {body['engine_error']}")
         else:

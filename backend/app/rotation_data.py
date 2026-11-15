@@ -23,7 +23,7 @@ from app.outlook_store import OutlookStore
 from app.rotation import engine
 from app.rotation.current import infer
 from app.rotation.site_facts import FarmInputs, build_outlook_facts, build_today
-from app.services import climate_trends, openmeteo, soil_profile
+from app.services import climate_trends, nasa_water, openmeteo, soil_profile
 from app.services.base import describe_failure
 
 log = logging.getLogger("farm_data")
@@ -85,18 +85,41 @@ def apply_ndvi(result: dict, ndvi_doc: dict) -> None:
     result["findings"] = found + [finding]
 
 
+def apply_water(result: dict, water: dict, trends_ok: dict | None) -> None:
+    """Use the NASA satellite water data (Req 23.6, 23.7, 23.9).
+
+    Adds IMERG's average rain for each calendar month over the same years as NASA POWER's
+    monthly rain, so the page can show the two side by side, and the low-groundwater finding.
+    """
+    if water.get("status") != "ok":
+        return
+    rain = water.get("rain") or {}
+    period = (trends_ok or {}).get("monthly", {}).get("period")  # e.g. "2016-2025"
+    if rain.get("status") == "ok" and period:
+        first, last = (int(x) for x in period.split("-"))
+        rain["calendar_vs_power"] = {
+            "period": period,
+            "imerg_mm": nasa_water.calendar_average(rain.get("monthly", []), first, last),
+            "power_mm": (trends_ok.get("monthly") or {}).get("rain_mm"),
+        }
+    finding = nasa_water.groundwater_finding(water)
+    if finding:
+        result["findings"] = list(result.get("findings", [])) + [finding]
+
+
 async def gather_rotation(client, lat: float, lon: float, cache: DiskCache, store: OutlookStore,
                           crops: dict, inputs: FarmInputs, today: date | None = None,
-                          ndvi_lookup=ndvi_store.get) -> dict:
+                          ndvi_lookup=ndvi_store.get, water_fetch=nasa_water.fetch) -> dict:
     """Return the full /api/rotation response for one location.
 
     Raises ValueError only when inputs.current_override is not a crop id (checked by the
     route before this is called, so in practice it does not happen).
     """
-    farm, profile, trends = await asyncio.gather(
+    farm, profile, trends, water = await asyncio.gather(
         gather_farm_data(client, lat, lon, cache),  # never raises
         _guarded("USDA SSURGO soil profile", "soil_profile", soil_profile.fetch(client, lat, lon, cache)),
         _guarded("NASA POWER daily climate", "climate_trends", climate_trends.fetch(client, lat, lon, cache, today)),
+        _guarded("NASA satellite water data", "nasa_water", water_fetch(client, lat, lon, cache, today=today)),
     )
     sources = farm["sources"]
     trends_ok = trends if trends.get("status") == "ok" else None
@@ -131,11 +154,17 @@ async def gather_rotation(client, lat: float, lon: float, cache: DiskCache, stor
         log.warning("farm_data source=ndvi error=%s", type(e).__name__)
         ndvi_doc = {"status": "unavailable", "reason": "the satellite greenness file could not be read"}
     apply_ndvi(result, ndvi_doc)
+    try:
+        apply_water(result, water, trends_ok)
+    except Exception as e:  # noqa: BLE001 - odd water data must not break the page
+        log.warning("farm_data source=nasa_water_apply error=%s", type(e).__name__)
 
     return {
         "location": {"lat": lat, "lon": lon},
         "missing_sources": list(today_facts.missing_sources),
         "ndvi": ndvi_doc,
+        # NASA satellite water data: IMERG rain, GRACE groundwater and soil moisture (Req 23).
+        "water": water,
         "inputs": {"priorities": sorted(inputs.priorities), "irrigation": inputs.irrigation,
                    "livestock": inputs.livestock, "no_till": inputs.no_till,
                    "current": inputs.current_override},

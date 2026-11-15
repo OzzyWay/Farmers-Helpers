@@ -159,7 +159,8 @@ Order changed on 2026-11-15 after a review: the engine and API first (7–9), th
     - _Requirements: 14.1_
 
 - [ ] 11. NASA water data: IMERG, GRACE and SMAP (needs `EARTHDATA_TOKEN`)
-  - [ ] 11.1 With the token set in `.env`, probe the GES DISC Giovanni Time Series API for Webberwood: `GPM_3IMERGM_07_precipitation`, `GRACEDADM_CLSM0125US_7D_4_0_gws_inst`, `GRACEDADM_CLSM0125US_7D_4_0_rtzsm_inst`. Save the responses as fixtures.
+  - [x] 11.1 With the token set in `.env`, probe the GES DISC Giovanni Time Series API for Webberwood: `GPM_3IMERGM_07_precipitation`, `GRACEDADM_CLSM0125US_7D_4_0_gws_inst`, `GRACEDADM_CLSM0125US_7D_4_0_rtzsm_inst`. Save the responses as fixtures.
+    - Done 2026-11-15 (`scripts/probe_nasa_water.py`): all three answer HTTP 200 as CSV in about 2 s (metadata lines, a blank line, then `Timestamp (UTC),Data`). IMERG monthly is in mm/hr on a 0.1° grid; GRACE-DA US is weekly percentiles (%) on a 0.125° grid. Fixtures: `tests/fixtures/giovanni_imerg_monthly.csv`, `giovanni_grace_gws.csv`, `giovanni_grace_rtzsm.csv`. Needs the "NASA GESDISC DATA ARCHIVE" app approved in Earthdata Login (without it the service answers HTTP 500 `{"message":null}` and GES DISC files answer 401).
   - [ ] 11.2 Probe SMAP through NASA AppEEARS (point sample of SPL3SMP_E or SPL4SMGP) with the same token; if it is rejected, record why and mark SMAP unavailable
   - [ ] 11.3 Implement `services/nasa_water.py`: authenticated requests (token never logged or cached), monthly IMERG rain with trend, GRACE groundwater and root-zone percentiles, SMAP where reachable, monthly cache
     - _Requirements: 23.1–23.6, 23.11_

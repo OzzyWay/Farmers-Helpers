@@ -49,7 +49,18 @@ def source_of(request: httpx.Request) -> str:
         return "cdl"
     if "open-meteo" in host:
         return "open_meteo"
+    if "giovanni" in host:
+        return "giovanni"
     raise AssertionError(f"unexpected host {host}")
+
+
+# NASA water data (Giovanni): real responses for Webberwood, saved 2026-11-15.
+GIOVANNI = {
+    "GPM_3IMERGM_07_precipitation": "giovanni_imerg_full.csv",
+    "GRACEDADM_CLSM0125US_7D_4_0_gws_inst": "giovanni_grace_gws_full.csv",
+    "GRACEDADM_CLSM0125US_7D_4_0_rtzsm_inst": "giovanni_grace_rtzsm_full.csv",
+    "GRACEDADM_CLSM0125US_7D_4_0_sfsm_inst": "giovanni_grace_sfsm_full.csv",
+}
 
 
 class Upstream:
@@ -76,10 +87,21 @@ class Upstream:
             if year >= 2026:
                 return httpx.Response(200, text=TEXT["cdl_fault"])
             return httpx.Response(200, text=cdl_xml("Evergreen Forest" if year == 2023 else "Grass/Pasture"))
+        if src == "giovanni":
+            if request.headers.get("authorization") != "Bearer test-token":
+                return httpx.Response(500, json={"message": None})  # how Giovanni rejects a login
+            name = GIOVANNI[request.url.params["data"]]
+            return httpx.Response(200, text=(FX / name).read_text(encoding="utf-8"))
         if src == "open_meteo":
             start = request.url.params["start_date"]
             return httpx.Response(200, text=TEXT["om_recent"] if start.startswith("1991") else TEXT["om_future"])
         return httpx.Response(200, text=TEXT[src])
+
+
+@pytest.fixture(autouse=True)
+def fake_earthdata_token(monkeypatch):
+    """Every test uses a fake token, so the real one in .env is never sent anywhere."""
+    monkeypatch.setenv("EARTHDATA_TOKEN", "test-token")
 
 
 @pytest.fixture
@@ -156,6 +178,36 @@ def test_response_carries_soil_trends_outlook_and_surface(api):
     hot_future = next(i for i in outlook["indicators"] if i["id"] == "hot_days")
     assert hot_future["future_value"]["mid"] > hot["recent_avg"]
     assert body["strategies"][1]["scores"]["outlook"] is not None
+
+
+def test_response_carries_the_nasa_water_data(api):
+    body = get(api(Upstream())).json()
+    water = body["water"]
+    assert water["status"] == "ok" and water["smap"]["status"] == "unavailable"
+    assert water["rain"]["status"] == "ok" and water["rain"]["calendar_vs_power"]["period"] == "2016-2025"
+    assert len(water["rain"]["calendar_vs_power"]["imerg_mm"]) == 12
+    for part in ("groundwater", "root_zone", "surface"):
+        assert water[part]["status"] == "ok" and water[part]["units"] == "percentile"
+    assert "test-token" not in json.dumps(body)  # the token never reaches the page
+
+
+def test_rejected_earthdata_login_keeps_everything_else(api, monkeypatch):
+    monkeypatch.setenv("EARTHDATA_TOKEN", "wrong-token")
+    r = get(api(Upstream()))
+    assert r.status_code == 200
+    body = r.json()
+    assert body["water"]["status"] == "unavailable" and "GESDISC" in body["water"]["reason"]
+    assert "wrong-token" not in r.text
+    assert body["strategies"] and body["trends"]["status"] == "ok"
+
+
+def test_missing_earthdata_token_is_reported_plainly(api, monkeypatch):
+    monkeypatch.delenv("EARTHDATA_TOKEN", raising=False)
+    up = Upstream()
+    body = get(api(up)).json()
+    assert body["water"]["status"] == "unavailable" and "not set up" in body["water"]["reason"]
+    assert "giovanni" not in up.calls  # nothing is requested without a token
+    assert body["strategies"]
 
 
 def test_same_request_gives_the_same_answer(api):
