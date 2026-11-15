@@ -1346,6 +1346,29 @@ body { background: var(--bg); line-height: 1.5; }
 .helper-form .btn:disabled { opacity: 0.6; cursor: not-allowed; }
 @media (max-width: 767px) { .chat-panel { max-height: 80vh; } }
 
+/* Voice (ElevenLabs): Listen button on each answer, microphone next to Ask */
+.chat-listen {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 36px; margin: 0 0 8px; padding: 6px 14px;
+  border-radius: var(--radius-pill); border: 1px solid var(--green); background: transparent; color: var(--green);
+  font: 600 13px var(--font); cursor: pointer;
+}
+.chat-listen:hover { background: var(--green-soft); }
+.chat-listen.is-on { background: var(--green); color: var(--on-green); }
+.chat-listen:focus-visible, .chat-mic:focus-visible { outline: 3px solid var(--leaf); outline-offset: 2px; }
+.chat-mic {
+  flex: 0 0 auto; width: 44px; min-height: 44px; border-radius: 50%;
+  border: 1px solid var(--control-border); background: var(--bg); color: var(--ink);
+  font-size: 18px; line-height: 1; cursor: pointer;
+}
+.chat-mic:hover:not(:disabled) { border-color: var(--green); }
+.chat-mic:disabled { opacity: 0.5; cursor: not-allowed; }
+.chat-mic.is-recording {
+  border-color: var(--error); background: var(--error); color: #fff;
+  animation: chat-mic-pulse 1.4s infinite ease-out;
+}
+@keyframes chat-mic-pulse { 0% { box-shadow: 0 0 0 0 rgba(166, 58, 42, 0.5); } 100% { box-shadow: 0 0 0 10px rgba(166, 58, 42, 0); } }
+@media (prefers-reduced-motion: reduce) { .chat-mic.is-recording { animation: none; } }
+
 /* NASA satellite water data (src/fieldSummary/WaterData.jsx) */
 .water-chart { height: 200px; }
 .water-facts { margin: 0; padding-left: 18px; font-size: 14px; }

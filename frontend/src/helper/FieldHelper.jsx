@@ -54,13 +54,52 @@ export default function FieldHelper({ place, rotation, weather }) {
   const request = useRef(null);
   const id = useId().replace(/:/g, "");
 
+  // Voice (ElevenLabs): one answer plays at a time; the microphone records one question at a time.
+  const [speaking, setSpeaking] = useState(null); // { key, status: "loading" | "playing" } or null
+  const [mic, setMic] = useState("idle"); // "idle" | "asking" (permission) | "recording" | "transcribing"
+  const [seconds, setSeconds] = useState(0);
+  const audioRef = useRef(null);
+  const audioUrls = useRef({}); // answer key -> object URL, so replays are instant and free
+  const recorder = useRef(null);
+  const micTimer = useRef(null);
+
+  function stopAudio() {
+    audioRef.current?.pause();
+    audioRef.current = null;
+    setSpeaking(null);
+  }
+
+  function stopRecording(send = true) {
+    clearInterval(micTimer.current);
+    const r = recorder.current;
+    if (!r) return;
+    r.sendWhenStopped = send;
+    if (r.state !== "inactive") r.stop();
+  }
+
   // A new spot starts a fresh conversation, so old answers never sit under a new place name.
   useEffect(() => {
     request.current?.abort();
+    stopAudio();
+    stopRecording(false);
     setLog([]);
     setBusy(false);
     setShowAll(false);
   }, [place?.lat, place?.lon]);
+
+  // Closing the panel or leaving the page stops any voice.
+  useEffect(() => {
+    if (open) return undefined;
+    stopAudio();
+    stopRecording(false);
+    setMic("idle");
+    return undefined;
+  }, [open]);
+  useEffect(() => () => {
+    stopAudio();
+    stopRecording(false);
+    Object.values(audioUrls.current).forEach((u) => URL.revokeObjectURL(u));
+  }, []);
 
   // When the panel opens, check whether the chat has its SerpApi key yet.
   useEffect(() => {
@@ -143,6 +182,91 @@ export default function FieldHelper({ place, rotation, weather }) {
     ask(typed);
   }
 
+  // ---- 🔊 Listen: read one answer aloud --------------------------------------------------------
+  async function listen(m) {
+    if (speaking?.key === m.key) return stopAudio(); // second tap stops it
+    stopAudio();
+    setSpeaking({ key: m.key, status: "loading" });
+    try {
+      let url = audioUrls.current[m.key];
+      if (!url) {
+        const r = await fetch("/api/speech/speak", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: m.text }),
+        });
+        if (!r.ok) {
+          const d = await r.json().catch(() => ({}));
+          throw new Error(d.detail || "Couldn't read this answer aloud. Please try again.");
+        }
+        url = URL.createObjectURL(await r.blob());
+        audioUrls.current[m.key] = url;
+      }
+      const audio = new Audio(url);
+      audioRef.current = audio;
+      audio.onended = () => { if (audioRef.current === audio) stopAudio(); };
+      await audio.play();
+      if (audioRef.current === audio) setSpeaking({ key: m.key, status: "playing" });
+    } catch (e) {
+      setSpeaking(null);
+      if (e.name !== "AbortError") add({ role: "error", text: e.message === "Failed to fetch" ? "Can't reach the app's server. Check that it is running, then try again." : e.message });
+    }
+  }
+
+  // ---- 🎤 Microphone: tap to talk, tap again to send ---------------------------------------------
+  async function toggleMic() {
+    if (mic === "recording") return stopRecording(true);
+    if (mic !== "idle" || busy) return;
+    if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === "undefined") {
+      add({ role: "error", text: "This browser can't record from a microphone. Try Chrome, Edge or Safari, or type your question." });
+      return;
+    }
+    let stream;
+    setMic("asking"); // the browser may show a permission pop-up first
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch (e) {
+      setMic("idle");
+      add({ role: "error", text: e.name === "NotAllowedError"
+        ? "The microphone is blocked. Allow microphone access for this site in your browser, then tap 🎤 again."
+        : "No microphone was found. Plug one in, or type your question." });
+      return;
+    }
+    stopAudio();
+    const type = ["audio/webm", "audio/mp4", "audio/ogg"].find((t) => MediaRecorder.isTypeSupported?.(t)) || "";
+    const r = new MediaRecorder(stream, type ? { mimeType: type } : undefined);
+    const chunks = [];
+    r.sendWhenStopped = true;
+    r.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
+    r.onstop = async () => {
+      stream.getTracks().forEach((t) => t.stop());
+      if (recorder.current === r) recorder.current = null;
+      if (!r.sendWhenStopped || !chunks.length) return setMic("idle");
+      setMic("transcribing");
+      try {
+        const blob = new Blob(chunks, { type: (r.mimeType || type || "audio/webm").split(";")[0] });
+        const res = await fetch("/api/speech/transcribe", { method: "POST", headers: { "Content-Type": blob.type }, body: blob });
+        const d = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(d.detail || "Couldn't understand the recording. Please try again.");
+        setMic("idle");
+        ask(d.text);
+      } catch (e) {
+        setMic("idle");
+        add({ role: "error", text: e.message === "Failed to fetch" ? "Can't reach the app's server. Check that it is running, then try again." : e.message });
+      }
+    };
+    recorder.current = r;
+    r.start();
+    setSeconds(0);
+    setMic("recording");
+    const started = Date.now();
+    micTimer.current = setInterval(() => {
+      const s = Math.floor((Date.now() - started) / 1000);
+      setSeconds(s);
+      if (s >= 45) stopRecording(true); // keep questions short (and cheap)
+    }, 250);
+  }
+
   const asked = new Set(log.filter((m) => m.role === "user").map((m) => m.text));
   const next = ALL.filter((q) => !asked.has(q)).slice(0, 3);
   const started = log.length > 0;
@@ -191,6 +315,15 @@ export default function FieldHelper({ place, rotation, weather }) {
                   {m.role === "error" && <p className="helper-a chat-error" role="alert">{m.text}</p>}
                   {m.role === "assistant" && (
                     <div className="helper-a chat-answer">
+                      <button
+                        type="button"
+                        className={`chat-listen${speaking?.key === m.key ? " is-on" : ""}`}
+                        onClick={() => listen(m)}
+                        aria-pressed={speaking?.key === m.key}
+                      >
+                        <span aria-hidden="true">{speaking?.key === m.key && speaking.status === "playing" ? "⏹" : "🔊"}</span>
+                        {speaking?.key !== m.key ? "Listen" : speaking.status === "loading" ? "Getting voice ready…" : "Stop"}
+                      </button>
                       <Markdown text={m.text} />
                       {m.sources.length > 0 && (
                         <details className="chat-sources">
@@ -250,14 +383,26 @@ export default function FieldHelper({ place, rotation, weather }) {
               ref={inputRef}
               id={`${id}-input`}
               type="text"
-              value={typed}
+              value={mic === "recording" ? "" : typed}
               onChange={(e) => setTyped(e.target.value)}
-              placeholder="Type your question here…"
+              placeholder={mic === "recording" ? `Listening… ${seconds}s · tap ⏹ when you're done`
+                : mic === "transcribing" ? "Writing down what you said…"
+                : mic === "asking" ? "Tap \"Allow\" on the microphone pop-up…" : "Type or tap 🎤 to talk…"}
               autoComplete="off"
               maxLength={MAX_CHARS}
-              disabled={busy}
+              disabled={busy || mic !== "idle"}
             />
-            <button type="submit" className="btn btn-primary" disabled={busy || !typed.trim()}>
+            <button
+              type="button"
+              className={`chat-mic${mic === "recording" ? " is-recording" : ""}`}
+              onClick={toggleMic}
+              disabled={busy || mic === "transcribing" || mic === "asking"}
+              aria-label={mic === "recording" ? "Stop recording and send" : "Talk: ask your question out loud"}
+              title={mic === "recording" ? "Stop and send" : "Tap and talk"}
+            >
+              <span aria-hidden="true">{mic === "recording" ? "⏹" : mic === "transcribing" ? "…" : "🎤"}</span>
+            </button>
+            <button type="submit" className="btn btn-primary" disabled={busy || mic !== "idle" || !typed.trim()}>
               {busy ? "Wait…" : "Ask"}
             </button>
           </form>
