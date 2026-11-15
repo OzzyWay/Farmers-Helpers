@@ -91,8 +91,9 @@ export default function DepthStory() {
 
         <div className="depth-grid">
           <div ref={sceneRef} className="depth-scene" data-active-step={active} aria-hidden="true">
-            <div className="depth-title">Field Shift</div>
+            <div className="depth-title">Farmer Helper</div>
             <div className="depth-grass">
+              <img src="/images/hero-field.jpg" alt="" />
               <span>GRASS LINE</span>
               <div className="grass-field">
                 {GRASS_BLADES.map((blade, index) => (
