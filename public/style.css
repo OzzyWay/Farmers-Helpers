@@ -1348,15 +1348,23 @@ body { background: var(--bg); color: var(--ink); }
 }
 .landing-hero .hero-shade {
   background:
-    radial-gradient(circle at 78% 23%, rgba(19, 29, 20, 0.64) 0 7%, transparent 19%),
-    linear-gradient(180deg, rgba(14, 24, 18, 0.4), rgba(18, 27, 21, 0.08) 42%, rgba(18, 27, 21, 0.58) 100%);
+    linear-gradient(90deg, transparent 0 55%, rgba(22, 31, 24, 0.42) 69%, rgba(22, 31, 24, 0.72) 100%),
+    linear-gradient(180deg, rgba(14, 24, 18, 0.4), rgba(18, 27, 21, 0.08) 42%, rgba(18, 27, 21, 0.66) 100%);
+}
+.landing-hero .hero-shade::before {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 77% 51%, rgba(24, 34, 26, 0.94) 0 9%, rgba(24, 34, 26, 0.62) 17%, transparent 32%);
+  content: "";
+  pointer-events: none;
 }
 .landing-hero .hero-sun {
   z-index: 1;
-  top: calc(58vh + var(--sun-progress, 0) * 24vh);
+  top: calc(72vh + var(--sun-progress, 0) * 16vh);
   right: 18vw;
-  width: clamp(64px, 9vw, 132px);
+  width: clamp(52px, 7vw, 96px);
   opacity: max(0, calc(1 - var(--sun-progress, 0) * 1.15));
-  background: radial-gradient(circle, #fff5b2 0 8%, #f5c65f 24%, rgba(228, 133, 47, 0.6) 44%, transparent 72%);
-  box-shadow: 0 0 36px 15px rgba(255, 175, 62, 0.18);
+  background: radial-gradient(circle, #ffe9a0 0 28%, #e9ad4f 62%, rgba(197, 115, 43, 0.42) 78%, transparent 79%);
+  box-shadow: none;
 }
+.landing-hero .hero-sun::after { display: none; }
