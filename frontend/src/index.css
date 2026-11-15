@@ -1331,13 +1331,9 @@ body { background: var(--bg); line-height: 1.5; }
   border: 0;
   border-radius: 0;
   overflow: hidden;
-  background:
-    radial-gradient(circle at 15% 44%, rgb(211 158 91 / 18%) 0 1px, transparent 2px),
-    radial-gradient(circle at 72% 62%, rgb(246 202 133 / 15%) 0 1px, transparent 2px),
-    linear-gradient(#241a16 0 25%, #4e2819 25% 43.75%, #7f3f1d 43.75% 62.5%, #ba6c3d 62.5% 81.25%, #493d36 81.25%);
-  background-size: 92px 80px, 127px 94px, auto;
+  background: transparent;
 }
-#depth-story .depth-scene svg { display: block; width: 100%; max-width: none; height: 100%; }
+#depth-story .depth-scene svg { display: block; width: 100%; max-width: none; height: 100svh !important; max-height: none !important; }
 #depth-story .depth-band-label { display: none; }
 #depth-story .depth-grass { height: 25%; border-bottom: 7px solid #30251d; }
 #depth-story .depth-grass img {
