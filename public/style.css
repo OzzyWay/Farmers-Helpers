@@ -816,6 +816,21 @@ body { background: var(--bg); color: var(--ink); }
   color: #f8f3e9;
 }
 
+.hero-roots {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  right: 0;
+  left: 0;
+  width: 100%;
+  height: 280px;
+  color: #c79d6c;
+  opacity: 0.2;
+  pointer-events: none;
+}
+.hero-roots .root-main { stroke-width: 3; }
+.hero-roots .root-branch { stroke-width: 1.5; opacity: 0.8; }
+
 .soil-descent::before { z-index: 8; height: 7px; }
 .descent-heading {
   position: relative;
