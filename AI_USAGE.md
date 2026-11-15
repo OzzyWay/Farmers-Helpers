@@ -1,0 +1,3 @@
+# AI Usage
+
+AI coding assistants were used to support development of Farmer Helper, including helping draft and refine code, explain implementation options, and prepare project documentation. AI suggestions were treated as assistance rather than authoritative output: project contributors are responsible for reviewing, adapting, and testing changes before relying on them. The design decisions, project direction, and final responsibility for the application remain with the team.
