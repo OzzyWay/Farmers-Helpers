@@ -1672,8 +1672,6 @@ body { background: var(--bg); line-height: 1.5; }
 
 /* SerpApi chat inside the helper panel (src/helper/FieldHelper.jsx, Markdown.jsx) */
 .chat-panel { max-height: min(72vh, 680px); }
-.chat-welcome { display: flex; flex-direction: column; gap: 4px; }
-.chat-hello { margin: 0; font: 600 1.05rem var(--font-display); color: var(--green); }
 .chat-setup {
   margin: 0; padding: 10px 12px; border-radius: 10px;
   background: var(--warn-soft); color: var(--warn); font-size: 13px; font-weight: 500;
