@@ -1337,7 +1337,8 @@ body { background: var(--bg); line-height: 1.5; }
     linear-gradient(#241a16 0 25%, #4e2819 25% 43.75%, #7f3f1d 43.75% 62.5%, #ba6c3d 62.5% 81.25%, #493d36 81.25%);
   background-size: 92px 80px, 127px 94px, auto;
 }
-#depth-story .depth-scene svg { width: 100%; max-width: none; height: 100%; }
+#depth-story .depth-scene svg { display: block; width: 100%; max-width: none; height: 100%; }
+#depth-story .depth-band-label { display: none; }
 #depth-story .depth-grass { height: 25%; border-bottom: 7px solid #30251d; }
 #depth-story .depth-grass img {
   position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
