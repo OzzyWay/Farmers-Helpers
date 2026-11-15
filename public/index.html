@@ -158,15 +158,17 @@
             <div><p class="eyebrow" id="region-kicker">Selected region</p><h2 id="region-name"></h2></div>
             <span class="condition-tag" id="region-condition"></span>
           </div>
-          <p class="region-location" id="region-location"></p>
-          <div class="region-metrics" id="region-metrics"></div>
-          <section class="region-section"><h3>Field outlook</h3><p id="region-outlook"></p></section>
-          <section class="region-section"><h3>Crop focus</h3><div id="region-crops" class="crop-focus"></div></section>
-          <section class="region-section">
-            <div class="resource-heading"><h3>Nearby support</h3><span>Sample placements</span></div>
-            <div id="region-resources" class="resource-list"></div>
-          </section>
-          <button type="button" id="analyze-region" class="region-action">Analyze this region <span aria-hidden="true">→</span></button>
+          <button type="button" id="analyze-region" class="region-action" aria-expanded="false" aria-controls="region-details">Analyze this region <span aria-hidden="true">→</span></button>
+          <div id="region-details" hidden>
+            <p class="region-location" id="region-location"></p>
+            <div class="region-metrics" id="region-metrics"></div>
+            <section class="region-section"><h3>Field outlook</h3><p id="region-outlook"></p></section>
+            <section class="region-section"><h3>Crop focus</h3><div id="region-crops" class="crop-focus"></div></section>
+            <section class="region-section">
+              <div class="resource-heading"><h3>Nearby support</h3><span>Sample placements</span></div>
+              <div id="region-resources" class="resource-list"></div>
+            </section>
+          </div>
         </aside>
       </div>
     </section>

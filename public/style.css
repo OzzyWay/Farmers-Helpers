@@ -312,7 +312,7 @@ body { background: var(--bg); color: var(--ink); }
 .resource-item strong { color: var(--ink); font-size: 0.71rem; }
 .resource-item > div > span { color: var(--muted); font-size: 0.66rem; }
 .resource-marker { flex: 0 0 auto; }
-.region-action { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-top: auto; padding: 0 12px; }
+.region-action { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-top: 14px; padding: 0 12px; }
 .region-action:hover { background: #294631; }
 .report { padding-bottom: 48px; }
 .report[hidden] { display: none; }

@@ -124,6 +124,9 @@ function initTexasDesk() {
 
   $("#analyze-region").addEventListener("click", () => {
     if (!selectedTexasRegion) return;
+    const details = $("#region-details");
+    details.hidden = false;
+    $("#analyze-region").setAttribute("aria-expanded", "true");
     $("#address").value = selectedTexasRegion.lookup;
     analyze(selectedTexasRegion.lookup);
   });
@@ -180,6 +183,8 @@ function pointInRegion(point, polygon) {
 
 function selectTexasRegion(region, zoom = true) {
   selectedTexasRegion = region;
+  $("#region-details").hidden = true;
+  $("#analyze-region").setAttribute("aria-expanded", "false");
   TEXAS_REGIONS.forEach((item) => item.layer.setStyle({
     color: item === region ? "#24251f" : "#fbfaf6",
     weight: item === region ? 3 : 1.5,
