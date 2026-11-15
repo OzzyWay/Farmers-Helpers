@@ -10,7 +10,7 @@ export default function RuralBenefits() {
         <h2 id="rural-benefits-title">{heading}</h2>
         <ul className="benefit-grid">
           {cards.map((c) => (
-            <li className="benefit-card" key={c.title}>
+            <li className="benefit-card foliage-card" key={c.title}>
               <h3>{c.title}</h3>
               <p>{c.text}</p>
             </li>

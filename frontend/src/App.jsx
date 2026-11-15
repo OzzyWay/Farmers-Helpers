@@ -26,6 +26,7 @@ const NARROW = "(max-width: 767px)"; // below this the panel becomes a bottom sh
  * click loads new farm data.
  */
 export default function App() {
+  const isFieldDesk = window.location.pathname === "/field-desk";
   // location = { lat, lon, label, source }
   const [location, setLocation] = useState(null);
   const [farms, setFarms] = useState([]);
@@ -43,6 +44,10 @@ export default function App() {
       : null;
   const summaryRef = useRef(null);
   const reducedMotion = usePrefersReducedMotion();
+
+  useEffect(() => {
+    document.title = isFieldDesk ? "Field Desk · Farmer Helper" : "Farmer Helper";
+  }, [isFieldDesk]);
 
   // National Weather Service forecast and alerts: one request feeds the card and the pop-ups.
   const weather = useWeather(location?.lat, location?.lon);
@@ -112,88 +117,99 @@ export default function App() {
 
   return (
     <>
-    <SkipLink targetId="map-section" />
+    {isFieldDesk && <SkipLink targetId="map-section" />}
     {/* Landing: plain bundled text with no data call, so it shows before the map and charts load. */}
-    <Hero />
-    <DepthStory />
-    <HowItWorks />
-    <RuralBenefits />
+    {!isFieldDesk && (
+      <>
+        <Hero />
+        <DepthStory />
+        <HowItWorks />
+        <RuralBenefits />
+      </>
+    )}
 
     {/* The map section fills one screen; the field summary follows it as the page scrolls.
         --sheet-h lets the CSS lift the map controls above the bottom sheet on narrow screens. */}
-    <div
-      id="map-section"
-      ref={mapSectionRef}
-      tabIndex={-1}
-      className="app"
-      style={{ "--sheet-h": `${narrow ? panel.height : 0}px` }}
-    >
-      {location && (
-        <TerrainMap lat={location.lat} lon={location.lon} onPick={pickOnMap} padding={padding} />
-      )}
-
-      <header ref={topbarRef} className="topbar frosted">
-        <h2 className="topbar-title">Farmer Helper</h2>
-        {farms.length > 0 && (
-          <div className="demo-farms" role="group" aria-label="Demo farms">
-            {farms.map((f) => (
-              <button
-                key={f.id}
-                type="button"
-                className="btn"
-                onClick={() => setLocation({ lat: f.lat, lon: f.lon, label: f.name, source: "Demo farm" })}
-              >
-                {f.name}
-              </button>
-            ))}
-          </div>
-        )}
-        <LocationSearch onFound={setLocation} />
+    {isFieldDesk && (
+      <div
+        id="map-section"
+        ref={mapSectionRef}
+        tabIndex={-1}
+        className="app"
+        style={{ "--sheet-h": `${narrow ? panel.height : 0}px` }}
+      >
         {location && (
-          <p className="topbar-place">
-            {location.label} · {location.source}. The yellow box marks an estimated area about 1 km across, not your
-            exact field boundary. Click the map to choose another spot.
-          </p>
+          <TerrainMap lat={location.lat} lon={location.lon} onPick={pickOnMap} padding={padding} />
         )}
-        {error && (
-          <p className="topbar-error" role="alert">
-            {error}
-          </p>
+
+        <header ref={topbarRef} className="topbar frosted">
+          <a className="desk-back-link" href="/">← Farmer Helper</a>
+          <h2 className="topbar-title">Farmer Helper</h2>
+          {farms.length > 0 && (
+            <div className="demo-farms" role="group" aria-label="Demo farms">
+              {farms.map((f) => (
+                <button
+                  key={f.id}
+                  type="button"
+                  className="btn"
+                  onClick={() => setLocation({ lat: f.lat, lon: f.lon, label: f.name, source: "Demo farm" })}
+                >
+                  {f.name}
+                </button>
+              ))}
+            </div>
+          )}
+          <LocationSearch onFound={setLocation} />
+          {location && (
+            <p className="topbar-place">
+              {location.label} · {location.source}. The yellow box marks an estimated area about 1 km across, not your
+              exact field boundary. Click the map to choose another spot.
+            </p>
+          )}
+          {error && (
+            <p className="topbar-error" role="alert">
+              {error}
+            </p>
+          )}
+        </header>
+
+        <FarmDataPanel
+          farm={farm}
+          place={location}
+          soilModelData={activeSoilModelData}
+          collapsed={sheetCollapsed}
+          onToggleCollapsed={() => setSheetCollapsed((c) => !c)}
+          panelRef={panelRef}
+        />
+
+        {location && (
+          <button type="button" className="summary-pill frosted" onClick={goToSummary}>
+            Your field summary <span aria-hidden="true">↓</span>
+          </button>
         )}
-      </header>
+      </div>
+    )}
 
-      <FarmDataPanel
-        farm={farm}
-        place={location}
-        soilModelData={activeSoilModelData}
-        collapsed={sheetCollapsed}
-        onToggleCollapsed={() => setSheetCollapsed((c) => !c)}
-        panelRef={panelRef}
-      />
+    {isFieldDesk && (
+      <SummaryErrorBoundary resetKey={location ? `${location.lat},${location.lon}` : ""}>
+        <FieldSummary
+          place={location}
+          sectionRef={summaryRef}
+          onSoilModelData={receiveSoilModelData}
+          weather={weather}
+          dismissedCount={dismissedHere}
+          onRestoreAlerts={dismissed.restore}
+        />
+      </SummaryErrorBoundary>
+    )}
 
-      {location && (
-        <button type="button" className="summary-pill frosted" onClick={goToSummary}>
-          Your field summary <span aria-hidden="true">↓</span>
-        </button>
-      )}
-    </div>
+    {!isFieldDesk && <ClosingCta />}
 
-    <SummaryErrorBoundary resetKey={location ? `${location.lat},${location.lon}` : ""}>
-      <FieldSummary
-        place={location}
-        sectionRef={summaryRef}
-        onSoilModelData={receiveSoilModelData}
-        weather={weather}
-        dismissedCount={dismissedHere}
-        onRestoreAlerts={dismissed.restore}
-      />
-    </SummaryErrorBoundary>
-
-    <ClosingCta />
-
-    <div style={{ "--topbar-h": `${topbar.height}px` }}>
-      <AlertToasts weather={weather} dismissed={dismissed} mapVisible={mapVisible} />
-    </div>
+    {isFieldDesk && (
+      <div style={{ "--topbar-h": `${topbar.height}px` }}>
+        <AlertToasts weather={weather} dismissed={dismissed} mapVisible={mapVisible} />
+      </div>
+    )}
     </>
   );
 }
