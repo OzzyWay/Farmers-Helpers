@@ -3,13 +3,15 @@ import json
 from pathlib import Path
 
 from dotenv import load_dotenv
-from fastapi import BackgroundTasks, Body, Depends, FastAPI, HTTPException, Query
+from fastapi import BackgroundTasks, Body, Depends, FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.responses import Response
+from starlette.concurrency import run_in_threadpool
 import rasterio
 
 from app import chat as chat_service
+from app import speech as speech_service
 from app.cache import DiskCache
 from app.farm_data import gather_farm_data
 from app.geocode import GeocodeError, check_location, geocode
@@ -385,3 +387,36 @@ def chat_endpoint(payload: dict = Body(...)):
         )
     except chat_service.ChatError as e:
         raise HTTPException(status_code=e.status, detail=str(e))
+
+
+@app.get("/api/speech/status")
+def speech_status():
+    """Whether voice (ElevenLabs) has a key, so the page can say so before anyone taps."""
+    return {"ready": speech_service.key_configured()}
+
+
+@app.post("/api/speech/speak")
+def speech_speak(payload: dict = Body(...)):
+    """Read a chat answer aloud. Body: {"text": markdown}. Returns audio/mpeg."""
+    text = payload.get("text") if isinstance(payload, dict) else None
+    if not isinstance(text, str) or not text.strip():
+        raise HTTPException(status_code=400, detail="There is nothing to read aloud.")
+    if len(text) > 20000:
+        raise HTTPException(status_code=400, detail="That answer is too long to read aloud.")
+    try:
+        audio = speech_service.speak(text)
+    except speech_service.SpeechError as e:
+        raise HTTPException(status_code=e.status, detail=str(e))
+    return Response(audio, media_type="audio/mpeg", headers={"Cache-Control": "private, max-age=3600"})
+
+
+@app.post("/api/speech/transcribe")
+async def speech_transcribe(request: Request):
+    """Turn a recorded question into text. Body: the raw recording (Content-Type audio/webm etc.).
+    Returns {"text": "..."}."""
+    audio = await request.body()
+    try:
+        text = await run_in_threadpool(speech_service.transcribe, audio, request.headers.get("content-type", ""))
+    except speech_service.SpeechError as e:
+        raise HTTPException(status_code=e.status, detail=str(e))
+    return {"text": text}
