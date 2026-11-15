@@ -1354,10 +1354,10 @@ body { background: var(--bg); line-height: 1.5; }
 }
 #depth-story .depth-steps {
   position: relative; z-index: 6; display: flex; min-width: 0;
-  flex-direction: column; gap: 0; padding: 0; pointer-events: none;
+  width: 100%; max-width: none; flex-direction: column; gap: 0; padding: 0; pointer-events: none;
 }
 #depth-story .depth-step {
-  width: min(500px, 46vw); min-height: 82svh; margin: 0 10vw 0 auto;
+  width: min(500px, 46vw); min-height: 82svh; margin: 0 6vw 0 auto;
   padding: 44px 38px; display: flex; flex-direction: column; justify-content: center;
   pointer-events: auto; border: 1px solid rgb(184 215 111 / 34%);
   border-left: 6px solid rgb(184 215 111 / 42%); border-radius: 10px;
@@ -1370,19 +1370,19 @@ body { background: var(--bg); line-height: 1.5; }
   box-shadow: 0 20px 50px rgb(0 0 0 / 36%); opacity: 1; transform: translateY(0);
 }
 #depth-story .depth-step[data-step="grass"][data-active="true"] {
-  background: linear-gradient(145deg, rgb(72 112 40 / 96%), rgb(39 69 30 / 96%));
+  background: linear-gradient(145deg, #4f7a3a, #304d29);
 }
 #depth-story .depth-step[data-step="topsoil"][data-active="true"] {
-  background: linear-gradient(145deg, rgb(82 94 43 / 96%), rgb(44 63 29 / 96%));
+  background: linear-gradient(145deg, #5a3f2c, #352419);
 }
 #depth-story .depth-step[data-step="subsoil"][data-active="true"] {
-  background: linear-gradient(145deg, rgb(91 82 43 / 96%), rgb(55 55 29 / 96%));
+  background: linear-gradient(145deg, #7a5a3c, #503823);
 }
 #depth-story .depth-step[data-step="parent"][data-active="true"] {
-  background: linear-gradient(145deg, rgb(106 83 48 / 96%), rgb(66 54 30 / 96%));
+  background: linear-gradient(145deg, #9a7d5c, #6d563e);
 }
 #depth-story .depth-step[data-step="bedrock"][data-active="true"] {
-  background: linear-gradient(145deg, rgb(81 88 61 / 96%), rgb(39 56 44 / 96%));
+  background: linear-gradient(145deg, #6b6a64, #474640);
 }
 #depth-story .depth-step h3 { max-width: 12ch; color: #fffaf0; font-size: clamp(2.25rem, 4vw, 3.4rem); }
 #depth-story .depth-step p { color: rgb(255 250 240 / 78%); }
