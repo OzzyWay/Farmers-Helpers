@@ -9,6 +9,8 @@ rotations.
 
 > 🚀 **Hackathon submissions:** NASA International Space Apps Challenge · RiverHacks
 
+**A live demo can be found here:** https://sigma-rust-three.vercel.app/
+
 ## 🧭 Contents
 
 | | | |
