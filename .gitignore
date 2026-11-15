@@ -22,3 +22,7 @@ backend/verify_report.txt
 backend/diagnose_report.txt
 backend/scripts/build_ndvi_log.txt
 backend/scripts/*_out*.txt
+examples/
+
+.gitignore
+hf_test.py

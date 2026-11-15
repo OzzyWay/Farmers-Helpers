@@ -26,9 +26,9 @@ export default function SoilBlock({ profile, surface, facts, compact = false }) 
     return (
       <div className="soil-empty">
         <p>
-          <strong>No soil layers to draw here.</strong>{" "}
-          {profile?.reason ? `${capital(profile.reason)}.` : "The soil survey did not answer."} The USDA soil survey
-          does not cover every spot (for example towns, water and some public land).
+          <strong>No soil layers are available here.</strong>{" "}
+          {profile?.reason ? `${capital(profile.reason)}.` : "The USDA soil map did not have information for this spot."} The map
+          does not cover every place, such as towns, water and some public land.
         </p>
       </div>
     );
@@ -48,7 +48,7 @@ export default function SoilBlock({ profile, surface, facts, compact = false }) 
       <Cube layers={layers} bottom={bottom} surface={surface} runoff={runoff} slow={slow} profile={profile} />
       {compact && (
         <>
-          <p className="soil-caption">{profile.component || "Soil"} · {bottom} cm ({inch(bottom)} in) deep</p>
+          <p className="soil-caption">{profile.component || "Soil"} · layers shown to {bottom} cm ({inch(bottom)} in) deep</p>
           {surface && (
             <p className="small-print soil-surface-line">
               <span className="soil-swatch" style={{ background: surfaceColor(surface.value) }} aria-hidden="true" />
@@ -57,12 +57,12 @@ export default function SoilBlock({ profile, surface, facts, compact = false }) 
           )}
           {(runoff || slow || (flooding && flooding !== "none")) && (
             <ul className="soil-flags">
-              {runoff && <li className="soil-flag"><strong>Runoff:</strong> group {group}, rain soaks in slowly (blue arrow).</li>}
-              {slow && <li className="soil-flag"><strong>Slow drainage:</strong> {drainage.toLowerCase()} (dashed line).</li>}
+              {runoff && <li className="soil-flag"><strong>Rain runoff:</strong> rain soaks in slowly (blue arrow; soil group {group}).</li>}
+              {slow && <li className="soil-flag"><strong>Water drains slowly:</strong> {drainage.toLowerCase()} (dashed line).</li>}
               {flooding && flooding !== "none" && <li className="soil-flag"><strong>Flooding:</strong> {flooding}.</li>}
             </ul>
           )}
-          <ol className="soil-layer-list" aria-label="Soil profile layers, from surface downward">
+          <ol className="soil-layer-list" aria-label="Soil layers, from the surface downward">
             {layers.map((layer, i) => (
               <li className="soil-layer-row" key={`${layer.top_cm}-${layer.bottom_cm}-${i}`}>
                 <span className="soil-layer-swatch" style={layerStyle(layer.texture_group)} aria-hidden="true" />
@@ -99,13 +99,13 @@ export default function SoilBlock({ profile, surface, facts, compact = false }) 
         <ul className="soil-flags">
           {runoff && (
             <li className="soil-flag">
-              <span aria-hidden="true">↘</span> <strong>Runoff:</strong> hydrologic group {group}. Rain soaks in slowly, so
+              <span aria-hidden="true">↘</span> <strong>Rain runoff:</strong> soil group {group}. Rain soaks in slowly, so
               heavy rain tends to run off.
             </li>
           )}
           {slow && (
             <li className="soil-flag">
-              <span aria-hidden="true">💧</span> <strong>Slow drainage:</strong> {drainage.toLowerCase()}. Roots can sit in
+              <span aria-hidden="true">💧</span> <strong>Water drains slowly:</strong> {drainage.toLowerCase()}. Roots can sit in
               wet soil after rain.
             </li>
           )}
@@ -119,23 +119,23 @@ export default function SoilBlock({ profile, surface, facts, compact = false }) 
         <dl className="rows soil-facts">
           <div><dt>Soil</dt><dd>{profile.map_unit || profile.component || "–"}</dd></div>
           {drainage && <div><dt>Drainage</dt><dd>{drainage}</dd></div>}
-          {facts?.om_pct && <div><dt>Surface organic matter</dt><dd>{facts.om_pct.value}%</dd></div>}
+          {facts?.om_pct && <div><dt>Plant and animal material in surface soil</dt><dd>{facts.om_pct.value}%</dd></div>}
           {facts?.awc && <div><dt>Water the soil holds</dt><dd>{facts.awc.value} in per in of soil</dd></div>}
-          {facts?.k_factor && <div><dt>Erodibility (K)</dt><dd>{facts.k_factor.value}</dd></div>}
+          {facts?.k_factor && <div><dt>How easily soil washes away</dt><dd>{facts.k_factor.value}</dd></div>}
           {facts?.slope_high && <div><dt>Slope up to</dt><dd>{facts.slope_high.value}%</dd></div>}
         </dl>
         <p className="small-print">
-          {profile.source || "USDA SSURGO"}: averages for the mapped soil area, not a test of your field.
-          Drag the block, or focus it and use the Left and Right arrow keys, to turn it.
+          {profile.source || "USDA soil survey"}: averages for the mapped area, not a test of your field.
+          Drag the soil picture, or focus it and use the Left and Right arrow keys, to turn it.
         </p>
       </div>}
 
       <table className="visually-hidden" aria-hidden={compact ? "true" : undefined}>
-        <caption>Soil layers under this point, top to bottom</caption>
+        <caption>Soil layers under this spot, from the surface down</caption>
         <thead>
           <tr>
-            <th scope="col">Depth</th><th scope="col">Texture</th><th scope="col">Organic matter</th>
-            <th scope="col">Clay</th><th scope="col">Sand</th><th scope="col">Water held (in/in)</th>
+            <th scope="col">Depth</th><th scope="col">Soil feel</th><th scope="col">Plant and animal material</th>
+            <th scope="col">Clay</th><th scope="col">Sand</th><th scope="col">Water held (inches per inch of soil)</th>
           </tr>
         </thead>
         <tbody>
@@ -227,7 +227,7 @@ function Cube({ layers, bottom, surface, runoff, slow = false, profile }) {
   );
 
   const summary =
-    `Interactive 3D soil profile, ${bottom} cm (${inch(bottom)} in) deep.` +
+    `Interactive 3D picture of soil layers, shown to ${bottom} cm (${inch(bottom)} in) deep.` +
     (surface ? ` Surface cover: ${surface.value} (${surface.year}).` : "") +
     " Use the Left and Right arrow keys to turn it. Layer measurements follow.";
 
@@ -256,10 +256,10 @@ function Cube({ layers, bottom, surface, runoff, slow = false, profile }) {
 
 function layerMeasurements(layer) {
   const values = [
-    layer.om_pct != null ? `OM ${layer.om_pct}%` : null,
+    layer.om_pct != null ? `Plant and animal material ${layer.om_pct}%` : null,
     layer.clay_pct != null ? `Clay ${layer.clay_pct}%` : null,
     layer.sand_pct != null ? `Sand ${layer.sand_pct}%` : null,
-    layer.awc != null ? `Water ${layer.awc} in/in` : null,
+    layer.awc != null ? `Water held ${layer.awc} inches per inch of soil` : null,
   ].filter(Boolean);
   return values.length ? values.join(" · ") : "No extra measurements recorded";
 }
@@ -279,9 +279,9 @@ function Face({ className, w, left = 0, transform, layers, bottom, ticks = false
               <span className="band-title">{l.name ? `${l.name} · ` : ""}{soilGroup(l.texture_group).label}</span>
               <span className="band-detail">
                 {[
-                  l.om_pct != null ? `OM ${l.om_pct}%` : null,
+                  l.om_pct != null ? `Plant and animal material ${l.om_pct}%` : null,
                   l.clay_pct != null ? `Clay ${l.clay_pct}%` : null,
-                  l.awc != null ? `Water ${l.awc} in/in` : null,
+                  l.awc != null ? `Water held ${l.awc} inches per inch of soil` : null,
                 ].filter(Boolean).join(" · ") || "No layer measurements"}
               </span>
             </span>

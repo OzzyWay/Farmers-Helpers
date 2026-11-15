@@ -856,6 +856,103 @@ a { color: var(--accent-text); }
   }
 }
 
+/* ---------- raster overlays ---------- */
+.raster-panel {
+  position: absolute;
+  z-index: 3;
+  top: 104px;
+  left: var(--gap);
+  width: min(340px, calc(100vw - 2 * var(--gap)));
+  max-height: min(62vh, 570px);
+  overflow: hidden;
+  color: var(--text);
+}
+.raster-panel-toggle {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 11px 14px;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  font-weight: 650;
+  cursor: pointer;
+}
+.raster-panel-toggle span { font-size: 19px; line-height: 1; }
+.raster-panel-content { max-height: calc(min(62vh, 570px) - 42px); overflow-y: auto; padding: 0 12px 12px; }
+.raster-add-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 8px; }
+.raster-add-row input[type="search"] {
+  width: 100%; min-width: 0; border: 1px solid var(--control-border);
+  border-radius: 7px; background: var(--surface-solid); padding: 6px 8px; color: var(--text);
+}
+.raster-add-row select { min-width: 0; flex: 1; }
+.raster-add-row select, .raster-field select, .raster-date-picker select,
+.raster-style-row select, .raster-sync-date select {
+  max-width: 100%;
+  border: 1px solid var(--control-border);
+  border-radius: 7px;
+  background: var(--surface-solid);
+  padding: 5px 7px;
+  color: var(--text);
+}
+.raster-add-button { padding: 5px 10px; }
+.raster-overlay-item { border-top: 1px solid var(--divider); padding: 9px 0; }
+.raster-overlay-heading, .raster-time-heading, .raster-legend-values {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+}
+.raster-overlay-heading label { display: flex; align-items: flex-start; gap: 7px; font-size: 13px; font-weight: 600; }
+.raster-overlay-heading input, .raster-sync input { accent-color: var(--accent); }
+.raster-remove { border: 0; border-radius: 5px; background: transparent; color: var(--text-secondary); font-size: 12px; cursor: pointer; padding: 3px 6px; }
+.raster-field, .raster-date-picker, .raster-style-row, .raster-sync-date {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  margin-top: 7px; font-size: 12px;
+}
+.raster-field select, .raster-date-picker select, .raster-style-row select { max-width: 58%; }
+.raster-time-controls { margin-top: 8px; font-size: 12px; }
+.raster-time-heading button { margin-left: 3px; border: 0; border-radius: 5px; background: var(--surface-sunken); cursor: pointer; }
+.raster-time-controls input[type="range"], .raster-style-row input[type="range"] { min-width: 0; flex: 1; accent-color: var(--accent); }
+.raster-legend { margin-top: 9px; font-size: 11px; }
+.raster-legend strong { display: block; font-size: 12px; }
+.raster-legend-units { color: var(--text-secondary); margin-top: 2px; }
+.raster-legend-range { margin-top: 4px; color: var(--text-secondary); line-height: 1.4; }
+.raster-gradient { height: 10px; margin-top: 6px; border-radius: 3px; }
+.raster-gradient-viridis { background: linear-gradient(90deg, #440154, #3b528b, #21918c, #5ec962, #fde725); }
+.raster-gradient-magma { background: linear-gradient(90deg, #000004, #51127c, #b73779, #fc8961, #fcfdbf); }
+.raster-gradient-blue-red { background: linear-gradient(90deg, #313695, #74add1, #f7f7f7, #f46d43, #a50026); }
+.raster-legend-values { margin-top: 3px; color: var(--text-secondary); }
+.raster-nodata { display: flex; align-items: center; gap: 5px; margin-top: 4px; color: var(--text-secondary); }
+.raster-nodata i { width: 10px; height: 10px; border: 1px solid var(--control-border); background: repeating-linear-gradient(45deg, transparent, transparent 2px, var(--text-secondary) 2px, var(--text-secondary) 3px); }
+.raster-categories { display: flex; flex-wrap: wrap; gap: 3px 8px; margin-top: 5px; }
+.raster-categories span { display: inline-flex; gap: 3px; align-items: center; }
+.raster-categories i { width: 9px; height: 9px; }
+.raster-sync, .raster-sync-date { display: flex; align-items: center; gap: 6px; padding-top: 8px; border-top: 1px solid var(--divider); font-size: 12px; }
+.raster-sync-date { justify-content: space-between; }
+.raster-error { color: var(--error); font-size: 12px; }
+.raster-help { color: var(--text-secondary); font-size: 12px; }
+.raster-warning { color: var(--error); font-size: 11px; }
+.raster-description, .raster-summary-note { color: var(--text-secondary); font-size: 11px; }
+.raster-date-strip {
+  display: flex; gap: 4px; overflow-x: auto; margin-top: 6px; padding: 2px 0 5px;
+  white-space: nowrap; scrollbar-width: thin;
+}
+.raster-date-strip button {
+  flex: 0 0 auto; border: 1px solid var(--control-border); border-radius: 12px;
+  background: var(--surface-sunken); padding: 3px 8px; font-size: 10px; cursor: pointer;
+}
+.raster-date-strip button[aria-current="date"] { border-color: var(--accent); color: var(--accent-text); }
+.raster-summary { border-top: 1px solid var(--divider); margin-top: 10px; padding-top: 9px; }
+.raster-summary h3 { margin: 0 0 7px; font-size: 13px; }
+.raster-summary-button { width: 100%; font-size: 12px; }
+.raster-summary-item { border-top: 1px solid var(--divider); margin-top: 8px; padding-top: 7px; font-size: 11px; }
+.raster-summary-item > strong { display: block; font-size: 12px; }
+.raster-summary-variable { margin-top: 7px; }
+.raster-summary-variable p { margin: 3px 0; color: var(--text-secondary); line-height: 1.45; }
+@media (max-width: 767px) {
+  .raster-panel { top: 104px; }
+  .raster-panel-content { max-height: min(45vh, 430px); }
+}
+
 /* ======================================================================
    Warm earth look (from the colleague's Farmers-Helpers style.css)
    ====================================================================== */

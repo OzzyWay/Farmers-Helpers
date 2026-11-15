@@ -12,12 +12,12 @@ function trimNumber(n, digits = 1) {
 }
 
 /**
- * How coarse the data is, in words. 1000 m or more is shown in kilometres,
+ * How broad an area the data covers, in words. 1000 m or more is shown in kilometres,
  * anything smaller in metres: 50000 -> "50 km", 250 -> "250 m", 30 -> "30 m".
  */
 export function formatResolution(metres) {
   const m = Number(metres);
-  if (!Number.isFinite(m) || m <= 0) return "unknown resolution";
+  if (!Number.isFinite(m) || m <= 0) return "unknown area";
   if (m >= 1000) return `${trimNumber(m / 1000)} km`;
   return `${Math.round(m)} m`;
 }

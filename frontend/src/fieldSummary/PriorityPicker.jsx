@@ -42,7 +42,7 @@ export default function PriorityPicker({ inputs, onChange, crops, currentUnknown
           options={[["no", "No"], ["yes", "Yes"]]} onChange={(v) => set({ irrigation: v })} />
         <Radio name={`${id}-live`} legend="Do you keep livestock?" value={inputs.livestock}
           options={[["unknown", "Not sure"], ["yes", "Yes"], ["no", "No"]]} onChange={(v) => set({ livestock: v })} />
-        <Radio name={`${id}-till`} legend="No-till only?" value={inputs.no_till}
+        <Radio name={`${id}-till`} legend="Only suggest crops that can be planted without tilling?" value={inputs.no_till}
           options={[["no", "No"], ["yes", "Yes"]]} onChange={(v) => set({ no_till: v })} />
         <div className="field">
           <label htmlFor={`${id}-cur`} className="legend">

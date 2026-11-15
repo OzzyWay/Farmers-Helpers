@@ -118,7 +118,7 @@ export default function ClimateChart({ rows }) {
       </div>
 
       <table className="visually-hidden">
-        <caption>Monthly climate normals</caption>
+        <caption>Typical climate by month</caption>
         <thead>
           <tr>
             <th scope="col">Month</th>

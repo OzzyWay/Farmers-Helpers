@@ -12,38 +12,40 @@ export default function DataLimitations({ outlook }) {
       <h3 id="limits-h" className="card-title">Data and limitations</h3>
       <ul className="limits-list">
         <li>
-          <strong>Crop table written for Central Texas.</strong> The 15 crops, their months and limits come from SARE,
-          USDA NRCS plant guides and Texas A&amp;M AgriLife Extension, written for Central Texas. Elsewhere in the US,
+          <strong>Crop information for Central Texas.</strong> Details about 15 crops, their growing months and
+          limits come from SARE, USDA NRCS plant guides and Texas A&amp;M AgriLife Extension. Outside Central Texas,
           treat the options as rough ideas.
         </li>
         <li>
-          <strong>Estimated field area.</strong> The yellow box on the map is about 1 km around the point you chose.
-          It is not your field boundary.
+          <strong>Approximate field area.</strong> The yellow box covers about 1 km around the point you chose. It is
+          not your exact field boundary.
         </li>
         <li>
-          <strong>USDA NASS Cropland Data Layer, 30 m.</strong> What grew on one 30 m square each year, read from
-          satellite images. One square can be mislabelled (for example a tree line read as forest). Public domain.
+          <strong>USDA NASS Cropland Data Layer (yearly crop map, 30 m squares).</strong> Shows what may have grown
+          in each square, based on satellite images. A square can be mislabeled (for example, a tree line may show as
+          forest). Free to use.
         </li>
         <li>
-          <strong>USDA NRCS SSURGO soil survey.</strong> Averages for a mapped soil area (often several hectares), not a
-          test of your field. Public domain.
+          <strong>USDA NRCS SSURGO soil survey.</strong> Soil averages for a mapped area (often several hectares),
+          not a test of your field. Free to use.
         </li>
         <li>
-          <strong>NASA POWER, about 50 km.</strong> Daily weather since 1981 from NASA's models and satellites. It
-          describes the regional climate, not your field. Trends use the Theil–Sen slope and the Mann–Kendall test;
-          "clear" means p &lt; 0.05. Free to use, credit NASA Langley POWER.
+          <strong>NASA POWER weather information, about 50 km.</strong> Daily weather estimates since 1981, based on NASA's
+          models and satellites. It describes the regional climate, not your field. We use the Theil–Sen method to
+          measure long-term change and the Mann–Kendall test to check whether the pattern is likely real; "likely
+          change" means less than a 5% chance it is normal ups and downs. Free to use with credit to NASA Langley POWER.
         </li>
         <li>
-          <strong>2030–2049 outlook, Open-Meteo Climate API, about 10 km.</strong> The change from 1991–2020 in{" "}
-          {models || "three climate models"} under a high-emissions scenario, added to the NASA POWER averages. A range
-          of possible futures, not a forecast. Weather data by{" "}
+          <strong>Climate outlook for 2030–2049, Open-Meteo Climate API, about 10 km.</strong> The changes from 1991–2020 in{" "}
+          {models || "three climate models"} under a high-emissions scenario, added to the NASA weather averages. This
+          gives a range of possible futures, not a prediction. Weather information from{" "}
           <a href="https://open-meteo.com/" target="_blank" rel="noreferrer">Open-Meteo.com</a>, licensed{" "}
           <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a>.
         </li>
         <li>
-          <strong>Scores are a guide, not a yield model.</strong> They come from the crop table's low / medium / high
-          values and the field facts, with every formula shown under "How was this scored?". There are no prices,
-          equipment or labour data.
+          <strong>Scores are a guide, not a crop-yield prediction.</strong> They use the crop information's low /
+          medium / high values and the field facts. Every calculation is shown under "How was this scored?". Prices,
+          equipment and labor are not included.
         </li>
         <li>
           <strong>Map.</strong> Basemap © OpenStreetMap contributors via OpenFreeMap; terrain from Mapzen terrain

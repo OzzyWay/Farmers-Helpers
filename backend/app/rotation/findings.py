@@ -82,9 +82,9 @@ def slow_soak(facts: SiteFacts, trends, outlook, current_calendar):
     evidence = [f.cite() for f in (facts.hydro_group, facts.drainage) if f]
     return {
         "id": "slow_soak", "title": "Rain soaks in slowly",
-        "text": (f"This soil is in hydrologic group {group or 'unknown'}"
+        "text": (f"Rain soaks into this soil slowly (soil group {group or 'unknown'}"
                  + (f" and is {str(facts.drainage.value).lower()}" if facts.drainage else "")
-                 + ". Heavy rain runs off instead of soaking in, so living cover and residue matter more here."),
+                 + ". Heavy rain runs off instead of soaking in, so living cover and plant leftovers matter more here."),
         "evidence": evidence, "terms": ["hydrologic_group", "drainage_class"],
     }
 
@@ -108,7 +108,7 @@ def erosion_risk(facts: SiteFacts, trends, outlook, current_calendar):
         return None
     return {
         "id": "erosion_risk", "title": "This soil erodes easily",
-        "text": f"Erodibility K is {k:g}" + (f" on slopes up to {slope:g}%" if slope is not None else "") + ". Keep the soil covered, especially in the wettest months.",
+        "text": f"The soil wash-away rating (K factor) is {k:g}" + (f" on slopes up to {slope:g}%" if slope is not None else "") + ". Keep the soil covered, especially in the wettest months.",
         "evidence": [f.cite() for f in (facts.k_factor, facts.slope_high) if f], "terms": ["k_factor"],
     }
 
@@ -117,8 +117,8 @@ def low_om(facts: SiteFacts, trends, outlook, current_calendar):
     if not facts.om_pct or not isinstance(facts.om_pct.value, (int, float)) or facts.om_pct.value >= 2:
         return None
     return {
-        "id": "low_om", "title": "Low organic matter",
-        "text": f"The surface soil has about {facts.om_pct.value:g}% organic matter. Living roots and residue build it up over years.",
+        "id": "low_om", "title": "Not much plant material in the soil",
+        "text": f"The surface soil is about {facts.om_pct.value:g}% made of plant and animal material. Living roots and plant leftovers build it up over the years.",
         "evidence": [facts.om_pct.cite()], "terms": ["organic_matter"],
     }
 
@@ -162,12 +162,12 @@ def rain_variable(facts: SiteFacts, trends, outlook, current_calendar):
 
 def drying(facts, trends, outlook, current_calendar):
     items = _trend_items(trends)
-    for key, label, units in (("soil_wetness", "Root-zone soil wetness", "0–1"), ("water_balance", "Rain minus evaporation", "mm")):
+    for key, label, units in (("soil_wetness", "Soil wetness near roots", "0–1"), ("water_balance", "Rain minus evaporation", "mm")):
         item = items.get(key)
         if item and item.get("clear") and (item.get("per_decade") or 0) < 0:
             return {
                 "id": "drying", "title": "The soil is drying out",
-                "text": f"{label} has a clear downward trend since {item['years'][:4]} (NASA POWER model).",
+                "text": f"{label} has likely been going down since {item['years'][:4]} (NASA weather model).",
                 "evidence": [_trend_cite(trends, item, units)], "terms": ["soil_wetness"],
             }
     return None

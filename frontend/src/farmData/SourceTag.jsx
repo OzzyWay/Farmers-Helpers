@@ -3,7 +3,7 @@ import { formatFreshness, formatResolution } from "./format.js";
 /**
  * Small label saying where a group of facts came from, how coarse it is, and whether
  * it was fetched just now or read from the backend's saved copy.
- * Example: "NASA POWER · 50 km resolution · live"
+ * Example: "NASA POWER · covers about 50 km · live"
  */
 export default function SourceTag({ records }) {
   if (!records?.length) return null;
@@ -13,7 +13,7 @@ export default function SourceTag({ records }) {
     <p className="source-tag">
       <span>Source: {first.source}</span>
       <span aria-hidden="true">·</span>
-      <span>{formatResolution(first.resolution_m)} resolution</span>
+      <span>covers about {formatResolution(first.resolution_m)}</span>
       <span aria-hidden="true">·</span>
       <span>{freshness}</span>
     </p>

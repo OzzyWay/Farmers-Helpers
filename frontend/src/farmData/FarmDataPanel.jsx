@@ -7,9 +7,9 @@ import ViewState from "./ViewState.jsx";
 
 // Each view shows the facts from one backend source.
 const VIEWS = [
-  { id: "climate", label: "Climate", source: "nasa_power", Component: ClimateView, empty: "No climate data exists for this location." },
-  { id: "soil", label: "Soil", source: "ssurgo", Component: SoilView, empty: "No soil data exists for this location." },
-  { id: "crops", label: "Crop history", source: "cdl", Component: CropHistoryView, empty: "No crop history exists for this location. The USDA crop map covers the lower 48 states only." },
+  { id: "climate", label: "Climate", source: "nasa_power", Component: ClimateView, empty: "We couldn't find climate information for this location." },
+  { id: "soil", label: "Soil", source: "ssurgo", Component: SoilView, empty: "We couldn't find soil information for this location." },
+  { id: "crops", label: "Crop history", source: "cdl", Component: CropHistoryView, empty: "We couldn't find crop history for this location. The USDA crop map covers the lower 48 states only." },
 ];
 
 /** The sentence screen readers hear when the panel changes state. */
@@ -18,9 +18,9 @@ function announcement(farm, placeLabel) {
   if (farm.status === "error") return `Could not load farm data. ${farm.error}`;
   if (farm.status === "loaded") {
     const missing = VIEWS.filter((v) => farm.data.sources[v.source]?.status === "unavailable").map(
-      (v) => `${v.label} data unavailable: ${farm.data.sources[v.source].reason}.`
+      (v) => `Could not load ${v.label.toLowerCase()} information: ${farm.data.sources[v.source].reason}.`
     );
-    return ["Farm data loaded.", ...missing].join(" ");
+    return ["Farm information loaded.", ...missing].join(" ");
   }
   return "";
 }
@@ -38,8 +38,8 @@ function ViewBody({ view, farm, soilModelData }) {
   }
   const group = farm.data.sources[view.source];
   if (!group || group.status === "unavailable") {
-    const reason = group?.reason || "no answer from the data source";
-    return <ViewState kind="error" message={`${view.label} data is unavailable: ${reason}.`} onRetry={farm.retry} />;
+    const reason = group?.reason || "the information source did not respond";
+    return <ViewState kind="error" message={`We couldn't load ${view.label.toLowerCase()} information: ${reason}.`} onRetry={farm.retry} />;
   }
   if (!group.records.length) return <ViewState kind="empty" message={view.empty} />;
   const { Component } = view;
@@ -67,7 +67,7 @@ export default function FarmDataPanel({ farm, place, soilModelData, collapsed, o
         <div className="panel-title-row">
           <div>
             <h2 className="panel-title" id={titleId}>
-              Farm data
+              Farm details
             </h2>
             {place && (
               <p className="panel-subtitle">
@@ -86,7 +86,7 @@ export default function FarmDataPanel({ farm, place, soilModelData, collapsed, o
           </button>
         </div>
         <SegmentedControl
-          label="Farm data view"
+          label="Farm details"
           options={VIEWS}
           value={viewId}
           onChange={setViewId}

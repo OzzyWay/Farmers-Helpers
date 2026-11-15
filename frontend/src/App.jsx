@@ -151,8 +151,8 @@ export default function App() {
         <LocationSearch onFound={setLocation} />
         {location && (
           <p className="topbar-place">
-            {location.label} · {location.source}. Yellow box: about 1 km around the point. Click the map to
-            choose another spot.
+            {location.label} · {location.source}. The yellow box marks an estimated area about 1 km across, not your
+            exact field boundary. Click the map to choose another spot.
           </p>
         )}
         {error && (

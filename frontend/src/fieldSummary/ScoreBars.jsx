@@ -32,11 +32,11 @@ export default function ScoreBars({ scores, parts, weights }) {
         ))}
       </ul>
       <details className="details">
-        <summary>How was this scored?</summary>
+        <summary>How are these scores worked out?</summary>
         <p className="small-print">
           Each score is 0 to 100, built from the crop table and this field's facts. It compares options for this
-          field; it is not a yield forecast. Overall is the average, with your priorities counted twice.
-          {outlook && " The 2030-2049 score uses the projected climate and takes 15 points off for each crop at future risk."}
+          field; it does not predict crop yield. The overall score is an average, and the priorities you chose count
+          twice. {outlook && "The 2030–2049 score uses the climate outlook and subtracts 15 points for each crop that may face future risks."}
         </p>
         {DIMENSIONS.map((d) => (
           <div key={d.id} className="score-parts">

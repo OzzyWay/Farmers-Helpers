@@ -44,9 +44,9 @@ export default function SatelliteData({ ndvi }) {
   return (
     <div className="summary-card satellite">
       <p className="small-print">
-        How green this spot looks from NASA's MODIS satellite, every 16 days, {ndvi.period.replace("-", "–")}.{" "}
-        <TermInfo term="ndvi" /> One MODIS square is 250 m across (about 15 acres), so it can include roads, trees or a
-        neighbour's field. This is a satellite measurement, unlike the model-based climate data above.
+        How green this spot looks in NASA's MODIS satellite images, every 16 days, {ndvi.period.replace("-", "–")}.{" "}
+        <TermInfo term="ndvi" /> Each square covers 250 m (about 15 acres), so it may include roads, trees or a
+        neighbor's field. This is measured from satellite images, unlike the estimated climate information above.
       </p>
       <div className="trend-chart ndvi-chart" aria-hidden="true">
         <ResponsiveContainer width="100%" height="100%">
@@ -63,8 +63,8 @@ export default function SatelliteData({ ndvi }) {
               content={({ active, payload }) =>
                 active && payload?.length ? (
                   <div className="chart-tooltip">
-                    <strong>{payload[0].payload.date}</strong>: NDVI {formatNumber(payload[0].payload.ndvi, 2)}
-                    {payload[0].payload.quality === "marginal" ? " (marginal quality)" : ""}
+                    <strong>{payload[0].payload.date}</strong>: Greenness score {formatNumber(payload[0].payload.ndvi, 2)}
+                    {payload[0].payload.quality === "marginal" ? " (less reliable reading)" : ""}
                   </div>
                 ) : null
               }
@@ -79,7 +79,7 @@ export default function SatelliteData({ ndvi }) {
       <ol className="ndvi-months month-row" aria-label="Typical greenness by month">
         {ndvi.monthly.map((m) => {
           const isBare = bare.includes(m.month);
-          const label = `${MONTH_FULL[m.month - 1]}: ${m.typical_ndvi == null ? "no clear view" : `NDVI ${formatNumber(m.typical_ndvi, 2)}`}${isBare ? ", looked bare in most years" : ""}`;
+          const label = `${MONTH_FULL[m.month - 1]}: ${m.typical_ndvi == null ? "no clear view" : `greenness score ${formatNumber(m.typical_ndvi, 2)}`}${isBare ? ", looked bare in most years" : ""}`;
           return (
             <li key={m.month} className={`ndvi-cell${isBare ? " bare" : ""}`} aria-label={label} title={label}>
               <span className="cal-month" aria-hidden="true"><MonthName month={m.month} /></span>
@@ -93,14 +93,14 @@ export default function SatelliteData({ ndvi }) {
       </ol>
       <p className="small-print">
         {bare.length
-          ? `Looked bare (NDVI below ${ndvi.bare_threshold}) in at least half the years in: ${bare.map((m) => MONTH_FULL[m - 1]).join(", ")}.`
-          : `No month looked bare (NDVI below ${ndvi.bare_threshold}) in most years: the ground stayed covered.`}{" "}
+          ? `Looked bare (greenness score below ${ndvi.bare_threshold}) in at least half the years in: ${bare.map((m) => MONTH_FULL[m - 1]).join(", ")}.`
+          : `No month looked bare (greenness score below ${ndvi.bare_threshold}) in most years: the ground stayed covered.`}{" "}
         Source: {ndvi.source}, {ndvi.product}, prepared {ndvi.fetched_on}.
       </p>
 
       <table className="visually-hidden">
-        <caption>Satellite greenness (NDVI) every 16 days</caption>
-        <thead><tr><th scope="col">Date</th><th scope="col">NDVI</th></tr></thead>
+        <caption>Greenness score from satellite images every 16 days</caption>
+        <thead><tr><th scope="col">Date</th><th scope="col">Greenness score</th></tr></thead>
         <tbody>
           {ndvi.series.map((p) => (
             <tr key={p.date}><th scope="row">{p.date}</th><td>{formatNumber(p.ndvi, 2)}</td></tr>

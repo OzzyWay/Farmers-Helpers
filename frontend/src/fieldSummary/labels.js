@@ -5,23 +5,23 @@ export const PRIORITIES = [
   { id: "build_soil", label: "Build soil" },
   { id: "forage", label: "Grazing and hay" },
   { id: "income", label: "Income" },
-  { id: "fewer_passes", label: "Fewer field passes" },
+  { id: "fewer_passes", label: "Fewer trips across the field" },
 ];
 
 // The six scores, in the order the backend computes them (scoring.py).
 export const DIMENSIONS = [
   { id: "water", label: "Water use", help: "Higher means the crops need less water." },
-  { id: "soil", label: "Soil building", help: "Living roots, legumes, residue and deep roots." },
+  { id: "soil", label: "Soil building", help: "Living roots, crops that add nitrogen, plant leftovers and deep roots." },
   { id: "erosion", label: "Erosion protection", help: "Months with protective cover, the wettest month counted twice." },
-  { id: "forage", label: "Forage", help: "Grazing or hay value across the year." },
-  { id: "income", label: "Income (rough)", help: "Crop income level only. No local prices are used." },
-  { id: "passes", label: "Fewer field passes", help: "Fewer trips across the field for planting, spraying and harvest." },
+  { id: "forage", label: "Grazing and hay", help: "Grazing or hay value across the year." },
+  { id: "income", label: "Income (rough)", help: "Rough crop income level only. No local prices are used." },
+  { id: "passes", label: "Fewer trips across the field", help: "Fewer trips for planting, spraying and harvest." },
 ];
 
 export const CONFIDENCE = {
-  high: { label: "High confidence", text: "All main data sources answered." },
-  medium: { label: "Medium confidence", text: "Some data is missing." },
-  low: { label: "Low confidence", text: "Important data is missing, so treat this as a rough guide." },
+  high: { label: "More reliable", text: "All main information sources answered." },
+  medium: { label: "Somewhat reliable", text: "Some information is missing." },
+  low: { label: "Rough estimate", text: "Important information is missing, so treat this as a rough guide." },
 };
 
 // One colour per crop group, readable in both themes (text is drawn on the sunken surface, not on these).

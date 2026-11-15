@@ -3,9 +3,11 @@ import json
 from pathlib import Path
 
 from dotenv import load_dotenv
-from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, Query
+from fastapi import BackgroundTasks, Body, Depends, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.responses import Response
+import rasterio
 
 from app.cache import DiskCache
 from app.farm_data import gather_farm_data
@@ -16,6 +18,7 @@ from app.rotation.site_facts import LIVESTOCK_VALUES, PRIORITIES, FarmInputs
 from app.rotation_data import gather_rotation
 from app.weather_data import gather_weather
 from app.services.base import make_client
+from app.raster_overlays import RasterOverlayService
 
 ROOT = Path(__file__).resolve().parents[2]
 ENV_FILE = ROOT / ".env"
@@ -105,6 +108,7 @@ CROPS = crop_table.load()
 
 # One outlook store for the whole server: it remembers which outlook is loading.
 _outlook_store: OutlookStore | None = None
+_raster_overlay_service = RasterOverlayService()
 
 
 def get_crops() -> dict:
@@ -117,6 +121,106 @@ def get_outlook_store() -> OutlookStore:
     if _outlook_store is None:
         _outlook_store = OutlookStore(DiskCache())
     return _outlook_store
+
+
+def get_raster_overlay_service() -> RasterOverlayService:
+    return _raster_overlay_service
+
+
+@app.get("/api/rasters")
+def raster_catalog(
+    refresh: bool = Query(False),
+    service: RasterOverlayService = Depends(get_raster_overlay_service),
+):
+    """Discover raster paths without downloading raster pixels."""
+    try:
+        rasters = service.catalog(refresh=refresh)
+        return {"rasters": rasters, "warnings": service.warnings}
+    except (OSError, ValueError) as e:
+        raise HTTPException(status_code=500, detail=f"Could not read raster catalog: {e}")
+
+
+@app.get("/api/rasters/{asset_id}")
+def raster_details(
+    asset_id: str,
+    service: RasterOverlayService = Depends(get_raster_overlay_service),
+):
+    """Download and inspect only the selected raster."""
+    try:
+        asset = service.asset(asset_id)
+        return {
+            key: value
+            for key, value in asset.items()
+            if key not in {
+                "path", "identity", "modified", "series_key", "overrides",
+                "repo_id", "repo_path", "revision", "kind",
+            }
+        }
+    except KeyError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except PermissionError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except ConnectionError as e:
+        raise HTTPException(status_code=502, detail=str(e))
+    except (OSError, ValueError) as e:
+        raise HTTPException(status_code=422, detail=f"Could not inspect raster: {e}")
+
+
+@app.get("/api/rasters/{asset_id}/tiles/{z}/{x}/{y}.png")
+def raster_tile(
+    asset_id: str,
+    z: int,
+    x: int,
+    y: int,
+    band: int = Query(1, ge=1),
+    ramp: str = Query("viridis", pattern="^(viridis|magma|blue-red)$"),
+    service: RasterOverlayService = Depends(get_raster_overlay_service),
+):
+    """Read, reproject, and color only the requested 256px Web Mercator tile."""
+    try:
+        image = service.tile(asset_id, z, x, y, band, ramp)
+    except KeyError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except PermissionError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except ConnectionError as e:
+        raise HTTPException(status_code=502, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except (OSError, rasterio.errors.RasterioError) as e:
+        raise HTTPException(status_code=502, detail=f"Could not render raster tile: {e}")
+    return Response(
+        content=image,
+        media_type="image/png",
+        headers={"Cache-Control": "public, max-age=86400"},
+    )
+
+
+@app.post("/api/rasters/{asset_id}/summary")
+def raster_summary(
+    asset_id: str,
+    geometry: dict = Body(..., description="GeoJSON Polygon or MultiPolygon in EPSG:4326."),
+    service: RasterOverlayService = Depends(get_raster_overlay_service),
+):
+    """Calculate raster statistics only for pixels intersecting the selected region."""
+    try:
+        return service.summary(asset_id, geometry)
+    except KeyError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except PermissionError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except ConnectionError as e:
+        raise HTTPException(status_code=502, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except (OSError, rasterio.errors.RasterioError) as e:
+        raise HTTPException(status_code=422, detail=f"Could not summarize raster: {e}")
 
 
 def get_client_factory():

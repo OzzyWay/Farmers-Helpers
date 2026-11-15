@@ -6,7 +6,7 @@ local check are flagged (local_review) so the page can show them in their own st
 from app.rotation.site_facts import SiteFacts
 
 BASE_GAPS = [
-    "No soil test for pH, phosphorus or potassium.",
+    "No soil test for acidity (pH), phosphorus or potassium.",
     "No local market prices: the income score is a rough guide.",
     "No information about your equipment or labour.",
 ]
@@ -34,16 +34,16 @@ def why(strategy: dict, crops: dict, facts: SiteFacts, current: dict, findings: 
     if purpose in ("soil", "cover"):
         added = [s for s in strategy["slots"] if not s["fixed"]]
         legumes = [crops[c]["name"] for s in added for c in s["crop_ids"] if crops[c]["nitrogen_fixing"]]
-        text = "Adds living roots in a season that is open today"
+        text = "Adds living roots in a season with no crop growing today"
         if legumes:
             text += f", and {', '.join(legumes)} adds nitrogen from the air"
         if facts.om_pct:
-            text += f". Surface organic matter is {_fact_text(facts.om_pct)}"
+            text += f". The surface soil is {_fact_text(facts.om_pct)} plant and animal material"
         reasons.append({"text": text + ".", "evidence": [facts.om_pct.cite()] if facts.om_pct else []})
     if purpose == "erosion_water" and (facts.hydro_group or facts.flooding):
         f = facts.hydro_group or facts.flooding
-        reasons.append({"text": f"A deep-rooted perennial keeps the soil covered all year on a soil where rain soaks in "
-                                f"slowly (hydrologic group {facts.hydro_group.value if facts.hydro_group else 'unknown'}).",
+        reasons.append({"text": f"A deep-rooted perennial keeps the soil covered all year where rain soaks in "
+                                f"slowly (soil group {facts.hydro_group.value if facts.hydro_group else 'unknown'}).",
                         "evidence": [f.cite()]})
     if purpose == "income" and facts.rain_total:
         reasons.append({"text": f"Uses grain crops that need less water than corn; this field averaged "
@@ -61,7 +61,7 @@ def benefits(strategy: dict, crops: dict, inputs) -> list[str]:
     out = []
     legumes = [crops[i]["name"] for i in ids if crops[i]["nitrogen_fixing"]]
     if legumes:
-        out.append(f"{', '.join(legumes)} fix nitrogen, so the next crop needs less fertilizer.")
+        out.append(f"{', '.join(legumes)} add nitrogen, a plant nutrient, so the next crop may need less fertilizer.")
     deep = [crops[i]["name"] for i in ids if crops[i]["root_depth"] == "deep"]
     if deep:
         out.append(f"Deep roots ({', '.join(deep)}) reach water lower down and open channels for rain to soak in.")
@@ -82,11 +82,11 @@ def risks(strategy: dict, crops: dict, facts: SiteFacts) -> list[dict]:
     out = [{"text": f"{crops[i]['name']}: {r}", "local_review": True} for i in strategy["crop_ids"] for r in crops[i]["risks"]]
     group = str(facts.hydro_group.value) if facts.hydro_group else ""
     if group.startswith("D"):
-        out.append({"text": "Slow-soaking soil (group D): heavy rain runs off. Plan planting and grazing around wet spells.",
+        out.append({"text": "Rain soaks in slowly (soil group D), so heavy rain runs off. Plan planting and grazing around wet spells.",
                     "local_review": True})
     added = [s for s in strategy["slots"] if not s["fixed"] and s["role"] == "winter"]
     if added:
-        out.append({"text": "Ask your county extension agent about seeding rates and when to terminate the cover crop.",
+        out.append({"text": "Ask your county extension agent how much seed to use and when to end the cover crop.",
                     "local_review": True})
     return out or [{"text": "Check this plan with your county extension agent.", "local_review": True}]
 

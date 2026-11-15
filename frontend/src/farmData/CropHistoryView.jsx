@@ -7,7 +7,7 @@ export default function CropHistoryView({ records }) {
     <>
       <h3 className="view-heading">Crop history</h3>
       <p className="small-print">
-        What USDA's yearly satellite crop map shows at this exact spot ({years.length} year
+        What USDA's yearly crop map, made from satellite images, shows at this spot ({years.length} year
         {years.length === 1 ? "" : "s"}).
       </p>
       <ol className="crop-list">
@@ -19,8 +19,8 @@ export default function CropHistoryView({ records }) {
         ))}
       </ol>
       <p className="note">
-        The crop map labels each 30 m square from satellite images and can be wrong for a single square.
-        Compare it with what you know grew there.
+        The crop map labels each 30 m square and can get a single square wrong. Compare it with what you know grew
+        there.
       </p>
       <SourceTag records={records} />
     </>

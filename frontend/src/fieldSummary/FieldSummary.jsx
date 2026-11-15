@@ -91,8 +91,8 @@ export default function FieldSummary({ place, sectionRef, onSoilModelData, weath
           <h2 id="summary-h" className="summary-title">Your field summary</h2>
           {place && <p className="summary-place">{place.label} · {place.lat.toFixed(4)}, {place.lon.toFixed(4)}</p>}
           <p className="summary-lead">
-            Rotation ideas to compare and discuss with your county extension agent, built from NASA and USDA data
-            with rules you can read. The crop list is written for Central Texas.
+            Compare these crop-rotation ideas with your county extension agent. They use NASA and USDA information
+            and clear, written rules. The crop list is for Central Texas.
           </p>
         </header>
 
@@ -221,7 +221,7 @@ function SourceStatus({ data }) {
   }
   return (
     <div className="note warn-note">
-      <strong>Some data is missing, so confidence is lower:</strong>
+      <strong>Some information is missing, so these results are less certain:</strong>
       <ul>{missing.map((m) => <li key={m}>{m}</li>)}</ul>
     </div>
   );
@@ -233,7 +233,7 @@ function OutlookStatus({ data, outlook }) {
     const hot = data.outlook.indicators?.find((i) => i.id === "hot_days");
     return (
       <p className="note">
-        <strong>2030–2049 outlook loaded</strong>
+        <strong>Climate outlook for 2030–2049 is ready</strong>
         {data.outlook.origin === "precomputed" ? " (prepared in advance for this demo farm)" : ""}.
         {hot?.future_value && ` Days above 35 °C: about ${Math.round(hot.future_value.mid)} a year (range ${Math.round(hot.future_value.low)}–${Math.round(hot.future_value.high)} across ${data.outlook.models?.length || 3} models).`}{" "}
         Each option shows a 2030–2049 score.

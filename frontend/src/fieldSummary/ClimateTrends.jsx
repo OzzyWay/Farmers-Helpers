@@ -39,11 +39,11 @@ export default function ClimateTrends({ trends, outlook }) {
   return (
     <div className="trends">
       <p className="small-print">
-        Each dot is one year at this location ({trends.source}, about {Math.round(trends.resolution_m / 1000)} km, so it shows
-        the regional climate). The line is the trend: the typical change, not pulled by single extreme years. "Clear change"
-        means there is less than a 5% chance it is just normal ups and downs. Trends describe the past; they do not forecast
-        any single future year.
-        {outlook?.status === "ok" && " The shaded band on the right is the 2030–2049 range across the climate models."}
+        Each dot is one year of information for this area ({trends.source}, about {Math.round(trends.resolution_m / 1000)} km
+        across). The line shows the long-term change without letting unusually extreme years dominate. "Likely change"
+        means there is less than a 5% chance the pattern is just normal ups and downs. These trends describe the past;
+        they do not predict any one future year.
+        {outlook?.status === "ok" && " The shaded band on the right shows the range of possible averages for 2030–2049 from the climate models."}
       </p>
       <div className="trend-grid">
         {items.map((item) => (
@@ -52,8 +52,8 @@ export default function ClimateTrends({ trends, outlook }) {
       </div>
       {outlook?.status === "ok" && (
         <p className="small-print">
-          2030–2049 band: change from 1991–2020 in {outlook.models?.join(", ")} ({outlook.scenario}), added to the NASA POWER
-          1991–2020 average. Weather data by{" "}
+          2030–2049 range: each model's change from 1991–2020 ({outlook.models?.join(", ")}, {outlook.scenario}) is added
+          to NASA POWER's 1991–2020 average. Weather information from{" "}
           <a href="https://open-meteo.com/" target="_blank" rel="noreferrer">Open-Meteo.com</a>,{" "}
           <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a>.
         </p>
@@ -81,7 +81,7 @@ function TrendChart({ item, future }) {
       <div className="trend-head">
         <h4 id={titleId} className="trend-title">{item.label}</h4>
         <span className={`chip ${item.clear ? "chip-clear" : "chip-none"}`}>
-          {item.clear ? "Clear change" : "No clear change"}
+          {item.clear ? "Likely change" : "No clear pattern"}
         </span>
       </div>
       <p className="trend-words">{changeWords(item)}</p>
@@ -192,11 +192,11 @@ function trendLine(item, points, first, last) {
 
 /** "About 10 more days a year per decade", "About 3 days earlier each decade", ... */
 export function changeWords(item) {
-  if (item.method === "not_enough_years") return "Not enough years to judge a trend.";
+  if (item.method === "not_enough_years") return "Not enough years of information to spot a pattern.";
   if (item.method === "first_last_15") {
     const ch = item.change ?? 0;
-    if (Math.abs(ch) < 0.05) return "About the same in the last 15 years as in the first 15 (rare events, so compared as averages).";
-    return `About ${formatNumber(Math.abs(ch), 1)} ${ch > 0 ? "more" : "fewer"} ${unitWords(item.units)} in the last 15 years than in the first 15 (rare events, so compared as averages).`;
+    if (Math.abs(ch) < 0.05) return "About the same in the last 15 years as in the first 15; these rare events are compared using averages.";
+    return `About ${formatNumber(Math.abs(ch), 1)} ${ch > 0 ? "more" : "fewer"} ${unitWords(item.units)} in the last 15 years than in the first 15; these rare events are compared using averages.`;
   }
   const v = item.per_decade ?? 0;
   const n = formatNumber(Math.abs(v), item.units === "0–1" ? 3 : Math.abs(v) < 10 ? 1 : 0);

@@ -54,13 +54,13 @@ export default function ClimateView({ records }) {
 
   return (
     <>
-      <h3 className="view-heading">Climate normals</h3>
+      <h3 className="view-heading">Typical climate</h3>
       <div className="stat-grid">
         {stats.map((s) => (
           <Stat key={s.label} {...s} />
         ))}
       </div>
-      {period && <p className="small-print">Frost and heat estimates are averages of daily data for {period.replace("-", "–")}.</p>}
+      {period && <p className="small-print">Frost and heat estimates are yearly averages from daily data for {period.replace("-", "–")}.</p>}
 
       <h4 className="section-heading">Month by month</h4>
       {rows ? <ClimateChart rows={rows} /> : <p className="small-print">Monthly values are incomplete for this location.</p>}
@@ -73,8 +73,8 @@ export default function ClimateView({ records }) {
       )}
 
       <p className="note">
-        NASA POWER data covers an area about 50 km across. It describes the regional climate, not your
-        field.
+        NASA POWER climate estimates cover an area about 50 km across. They describe the regional climate, not the
+        weather in your field.
       </p>
       <SourceTag records={records} />
     </>

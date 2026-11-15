@@ -1,6 +1,7 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import maplibregl from "maplibre-gl";
 import { fieldAreaGeoJSON } from "./fieldArea.js";
+import RasterOverlayPanel from "./RasterOverlayPanel.jsx";
 
 // Basemap: OpenStreetMap data served by OpenFreeMap (free, no key).
 // Terrain: Mapzen "terrarium" elevation tiles hosted on AWS (free, no key).
@@ -22,6 +23,7 @@ const TERRAIN_TILES =
 export default function TerrainMap({ lat, lon, onPick, padding }) {
   const containerRef = useRef(null);
   const mapRef = useRef(null);
+  const [mapInstance, setMapInstance] = useState(null);
   const markerRef = useRef(null);
   const onPickRef = useRef(onPick);
   onPickRef.current = onPick;
@@ -49,6 +51,7 @@ export default function TerrainMap({ lat, lon, onPick, padding }) {
       },
     });
     mapRef.current = map;
+    setMapInstance(map);
     if (paddingRef.current) map.setPadding(paddingRef.current);
     map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-left");
     map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "bottom-left");
@@ -102,5 +105,10 @@ export default function TerrainMap({ lat, lon, onPick, padding }) {
     mapRef.current?.easeTo({ padding: { top, right, bottom, left }, duration: 300 });
   }, [top, right, bottom, left]);
 
-  return <div ref={containerRef} className="map" />;
+  return (
+    <>
+      <div ref={containerRef} className="map" />
+      <RasterOverlayPanel map={mapInstance} />
+    </>
+  );
 }

@@ -24,7 +24,7 @@ ROOT = {"shallow": 0.0, "medium": 0.5, "deep": 1.0}
 DIMENSIONS = ("water", "soil", "erosion", "forage", "income", "passes")
 LABELS = {
     "water": "Water use", "soil": "Soil building", "erosion": "Erosion protection",
-    "forage": "Forage", "income": "Income potential (rough)", "passes": "Fewer field passes",
+    "forage": "Grazing and hay", "income": "Income potential (rough)", "passes": "Fewer trips across the field",
 }
 # Which scores each farmer priority makes count double (Req 10.3).
 PRIORITY_DIMENSIONS = {
@@ -50,13 +50,13 @@ def score_water(cal, crops, facts, irrigation):
     if not occupied:
         return 100, [{"label": "No crop in the ground", "points": 100}]
     need = sum(max(LEVEL[crops[i]["water_need"]] for i in c["crop_ids"]) for c in occupied) / len(occupied)
-    parts = [{"label": f"Average crop water need ({need:.2f} on a 0-1 scale)", "points": round(100 - 100 * need)}]
+    parts = [{"label": f"Average crop water need ({need:.2f} on a scale from 0 to 1)", "points": round(100 - 100 * need)}]
     total = 100 - 100 * need
     hot_thirsty = sorted({crops[i]["name"] for c in occupied if c["heat"] for i in c["crop_ids"]
                           if crops[i]["water_need"] == "high"})
     if hot_thirsty and not irrigation:
         total -= 20
-        parts.append({"label": f"High-water crop in a heat-stress month without irrigation ({', '.join(hot_thirsty)})", "points": -20})
+        parts.append({"label": f"High-water crop in a very hot month without irrigation ({', '.join(hot_thirsty)})", "points": -20})
     ids = {i for c in occupied for i in c["crop_ids"]}
     if ids and all(crops[i]["drought_tolerance"] == "high" for i in ids):
         total += 10
@@ -74,7 +74,7 @@ def score_soil(cal, crops, strategy):
     parts = [
         {"label": f"Living roots in {rooted:.0%} of months", "points": round(40 * rooted)},
         {"label": "Includes a nitrogen-fixing legume" if legume else "No legume", "points": 20 if legume else 0},
-        {"label": f"Average residue left on the soil ({residue:.2f} on a 0-1 scale)", "points": round(20 * residue)},
+        {"label": f"Average plant material left on the soil ({residue:.2f} on a scale from 0 to 1)", "points": round(20 * residue)},
         {"label": "Has a deep-rooted crop" if deep else "No deep-rooted crop", "points": 20 if deep else 0},
     ]
     return _clamp(sum(p["points"] for p in parts)), parts
@@ -88,7 +88,7 @@ def score_erosion(cal, crops, facts):
         weighted += weight * cover
         total_weight += weight
     base = 100 * weighted / total_weight if total_weight else 0
-    parts = [{"label": "Months with protective cover (wettest month counted twice)", "points": round(base)}]
+    parts = [{"label": "Months with soil cover (wettest month counts twice)", "points": round(base)}]
     risks = []
     if facts.k_factor and isinstance(facts.k_factor.value, (int, float)):
         risks.append(facts.k_factor.value / 0.5)
@@ -97,7 +97,7 @@ def score_erosion(cal, crops, facts):
     site_risk = min(1.0, max(risks)) if risks else 0.0
     if site_risk:
         reduction = base * 0.5 * site_risk
-        parts.append({"label": f"Field erodes more easily (site risk {site_risk:.2f})", "points": -round(reduction)})
+        parts.append({"label": f"Soil is more likely to wash away here (risk score {site_risk:.2f})", "points": -round(reduction)})
         base -= reduction
     return _clamp(base), parts
 
@@ -107,7 +107,7 @@ def score_forage(cal, crops, livestock):
         return 0, [{"label": "You have no livestock", "points": 0}]
     cells = _cells(cal)
     value = sum(max((VALUE[crops[i]["forage_value"]] for i in c["crop_ids"]), default=0.0) for c in cells) / len(cells)
-    return _clamp(100 * value), [{"label": f"Average forage value across the year ({value:.2f} on a 0-1 scale)",
+    return _clamp(100 * value), [{"label": f"Average grazing and hay value across the year ({value:.2f} on a scale from 0 to 1)",
                                   "points": round(100 * value)}]
 
 
@@ -123,9 +123,9 @@ def score_income(crops, strategy):
 def score_passes(crops, strategy, no_till):
     years = max(1, strategy["years"])
     per_year = sum(crops[i]["field_passes_per_year"] for s in strategy["slots"] for i in s["crop_ids"]) / years
-    parts = [{"label": f"About {per_year:g} field passes a year", "points": round(100 - 10 * (per_year - 1))}]
+    parts = [{"label": f"About {per_year:g} trips across the field each year", "points": round(100 - 10 * (per_year - 1))}]
     if no_till:
-        parts.append({"label": "No-till only: every crop here can be no-till planted; check how covers are terminated", "points": 0})
+        parts.append({"label": "Only crops that can be planted without tilling; check how cover crops are ended", "points": 0})
     return _clamp(100 - 10 * (per_year - 1)), parts
 
 

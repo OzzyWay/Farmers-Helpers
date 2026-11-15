@@ -20,7 +20,7 @@ Requirements: Python 3.11+ and Node.js 20+.
 ```powershell
 # Secrets
 Copy-Item .env.example .env   # only if you don't already have a .env
-# then edit .env and set EARTHDATA_TOKEN=...
+# then edit .env and set the service credentials you use (including HF_TOKEN)
 
 # Backend
 cd backend
@@ -98,8 +98,51 @@ All farm data is requested by the Python backend, never by the browser. The map 
 - Basemap: OpenStreetMap data via [OpenFreeMap](https://openfreemap.org) (free, no key). © OpenStreetMap contributors.
 - 3D terrain: Mapzen Terrarium elevation tiles on AWS Open Data (free, no key).
 
+## Raster map overlays
+
+The map discovers `.tif` and `.tiff` files in the Hugging Face dataset repository
+`OzzyWay/Farmers-Helper` through the Hub API. Copy `.env.example` to `.env` and set
+`HF_TOKEN` to a Hugging Face **read** token scoped to this dataset repository. The token
+is read only by the Python backend; it is never returned to the browser. The backend
+uses only `OzzyWay/Farmers-Helper` for Hugging Face raster discovery and downloads.
+
+Discovery lists repository metadata and raster paths only. A raster is downloaded
+when the user selects it, using the Hugging Face cache at `backend/cache/huggingface`;
+Hub cache locks prevent concurrent requests from downloading the same file twice.
+The backend renders requested 256-pixel Web Mercator tiles and does not send
+full raster files to the browser. GeoTIFF NoData remains transparent. COGs and
+other GeoTIFFs are read by Rasterio/GDAL; the selected file is downloaded in full
+before tile rendering, so a COG does not avoid the initial file transfer. Local
+GeoTIFFs under `examples/` (or paths in
+`RASTER_DATA_DIRS`) remain available for development and tests.
+Tile requests are limited to each raster's geographic bounds and native
+resolution to avoid rendering empty or over-detailed tiles.
+
+SMAP L4 SPL4SMGP files can omit GeoTIFF georeferencing tags. When their embedded
+product ID, grid dimensions, and global extent match, the backend restores the
+documented EASE-Grid 2.0 Global reference (EPSG:6933); other rasters without
+matching georeferencing metadata remain unavailable rather than being guessed.
+See the [NSIDC SPL4SMGP product documentation](https://nsidc.org/data/spl4smgp/versions/7).
+
+Raster names, descriptions, units, and valid ranges are matched to
+`raster_layer_catalog.csv`. Band metadata is used when the catalog has no match;
+unmatched rasters are explicitly labeled as uncatalogued rather than assigned
+an inferred description. Add new source variables and their documented metadata
+to that CSV. New raster files in the Hugging Face dataset are discovered
+automatically; the backend does not download the repository at startup.
+
+Use the raster panel's date controls to navigate every dated file in a layer
+series. GAEZ files whose layer names end in a year are treated as annual frames;
+the catalog contains 1960–2010 sequences for most variables. Playback waits for
+the current map frame to load before advancing, avoiding skipped annual rasters.
+Use **Remove** on a selected layer to remove it from the map. For regional statistics, frame the map on the area of interest and choose
+**Summarize visible map area**. The backend reads intersecting raster windows,
+excludes NoData and pixels outside the region, and caches statistics by file,
+band, and region. Large-area median values use a documented sample; other
+statistics and valid-pixel counts are computed while streaming raster windows.
+
 ## Secrets
 
 - `.env` is in `.gitignore`. Never commit it, and never put tokens in frontend code.
-- Only the Python backend reads `EARTHDATA_TOKEN` and `NASS_QUICKSTATS_API_KEY`.
+- Only the Python backend reads `EARTHDATA_TOKEN`, `NASS_QUICKSTATS_API_KEY`, and `HF_TOKEN`.
 - The Earthdata token was shared in chat during planning. Revoke it and generate a new one at https://urs.earthdata.nasa.gov after the hackathon.

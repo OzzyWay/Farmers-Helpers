@@ -25,14 +25,14 @@ export default function SoilView({ records, soilModelData }) {
   const k = firstValue(g, "soil_erodibility_k");
 
   const stats = [];
-  if (om != null) stats.push({ value: formatNumber(om, 2), unit: "%", label: "Organic matter (surface layer)" });
+  if (om != null) stats.push({ value: formatNumber(om, 2), unit: "%", label: "Plant and animal material in topsoil" });
   if (awc != null) stats.push({ value: formatNumber(awc, 2), unit: "in/in", label: "Water the soil holds for plants, per inch of soil" });
-  if (k != null) stats.push({ value: formatNumber(k, 2), label: "Erodibility K factor (higher erodes more easily)" });
+  if (k != null) stats.push({ value: formatNumber(k, 2), label: "How easily soil washes away (higher means easier)" });
 
   const rows = [
-    ["Texture (surface layer)", firstValue(g, "soil_texture")],
+    ["Soil feel (surface layer)", firstValue(g, "soil_texture")],
     ["Drainage", firstValue(g, "soil_drainage_class")],
-    ["Hydrologic group", firstValue(g, "soil_hydrologic_group") != null ? describeGroup(firstValue(g, "soil_hydrologic_group")) : null],
+    ["How quickly rain soaks in", firstValue(g, "soil_hydrologic_group") != null ? describeGroup(firstValue(g, "soil_hydrologic_group")) : null],
     ["Slope", firstValue(g, "soil_slope_range") != null ? `${firstValue(g, "soil_slope_range")} %` : null],
   ].filter(([, v]) => v != null);
 
@@ -49,8 +49,8 @@ export default function SoilView({ records, soilModelData }) {
       )}
       {soilModelData?.status === "unavailable" && (
         <p className="note">
-          The layered soil model is unavailable{soilModelData.reason ? `: ${soilModelData.reason}` : " for this location"}.
-          The mapped soil facts below may still be available.
+          A picture of the soil layers is not available{soilModelData.reason ? `: ${soilModelData.reason}` : " for this location"}.
+          The soil information below may still be available.
         </p>
       )}
       {stats.length > 0 && (
@@ -71,8 +71,8 @@ export default function SoilView({ records, soilModelData }) {
         </dl>
       )}
       <p className="note">
-        SSURGO values are averages for a mapped soil area. They are not measurements of your field. A soil
-        test tells you what is really there.
+        USDA NRCS SSURGO soil-map values are averages for a mapped area, not measurements from your field. A soil test
+        tells you what is really there.
       </p>
       <SourceTag records={records} />
     </>
