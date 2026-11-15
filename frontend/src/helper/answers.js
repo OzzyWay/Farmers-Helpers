@@ -33,6 +33,9 @@ export const QUESTIONS = [
     keywords: ["hotter", "warmer", "warming", "hot days", "warm nights", "climate", "heat trend", "temperature trend"] },
   { id: "rain_trend", group: "Climate since the 1980s", label: "Is the rain changing?", needs: "rotation",
     keywords: ["rain changing", "rainfall", "drought", "dry", "dry spell", "heavy rain", "rain trend", "less rain", "more rain"] },
+  { id: "groundwater", group: "Climate since the 1980s", label: "Is groundwater or soil moisture low?", needs: "rotation",
+    keywords: ["groundwater", "ground water", "well", "wells", "aquifer", "soil moisture", "grace", "water table",
+      "running low", "run low", "dry well"] },
   { id: "outlook", group: "Climate since the 1980s", label: "What about 2030–2049?", needs: "rotation",
     keywords: ["future", "2030", "2040", "2049", "outlook", "projection", "coming years", "climate change"] },
 
@@ -282,6 +285,30 @@ const BUILDERS = {
     return { paragraphs: ["From NASA's daily weather record for the region around your farm."], items, sources: [powerSource(t)], terms: ["variation", "clear_change"] };
   },
 
+  groundwater({ rotation }) {
+    const w = rotation.water;
+    const source = "NASA GRACE/GRACE-FO data assimilation (GRACE-DA), weekly, about 14 km, via NASA GES DISC";
+    if (w?.status !== "ok") return { paragraphs: [unavailable("NASA's satellite water data", w)], sources: [source] };
+    const items = [];
+    for (const [key, name] of [["groundwater", "Groundwater"], ["root_zone", "Root-zone soil moisture"], ["surface", "Surface soil moisture"]]) {
+      const p = w[key];
+      if (p?.status !== "ok") continue;
+      items.push(`${name}: ${round(p.latest.pct)} in the week of ${p.latest.date} (${pctWords(p.latest.pct)}); ${round(p.last_12m_avg)} on average over the last 12 months.`);
+    }
+    if (!items.length) return { paragraphs: ["GRACE values are not available for this spot."], sources: [source] };
+    const low = (w.groundwater?.last_12m_avg ?? 100) < 20;
+    return {
+      paragraphs: ["Percentiles compare each week with the same week in 1948–2012: 10 is very dry, 50 is normal, 90 is very wet."],
+      items,
+      notes: [
+        low ? "Groundwater has been low for a year. Wells may run lower, so water-saving crops and cover that helps rain soak in matter more."
+            : "Groundwater has not been in drought on average over the last year.",
+        "GRACE sees a region hundreds of kilometres wide, so this is the regional picture, not your well.",
+      ],
+      sources: [source], terms: ["percentile", "grace"], expert: low,
+    };
+  },
+
   outlook({ rotation }) {
     const o = rotation.outlook;
     if (o?.status !== "ok") {
@@ -451,6 +478,14 @@ function outlookLine(o, id) {
     return `${i.label || "Yearly rain"}: about ${round(v.mid)} mm (${inches(v.mid / 25.4)} in) a year, range ${round(v.low)} to ${round(v.high)} mm${i.baseline_avg != null ? `, against ${round(i.baseline_avg)} mm in ${o.recent}` : ""}.`;
   }
   return `${i.label}: about ${round(v.mid)} a year (range ${round(v.low)} to ${round(v.high)})${i.baseline_avg != null ? `, against ${round(i.baseline_avg)} in ${o.recent}` : ""}.`;
+}
+
+function pctWords(p) {
+  if (p < 10) return "very dry";
+  if (p < 20) return "dry";
+  if (p <= 80) return "near normal";
+  if (p <= 90) return "wet";
+  return "very wet";
 }
 
 function unitWord(units) {

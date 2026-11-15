@@ -1120,3 +1120,8 @@ body { background: var(--bg); line-height: 1.5; }
   .helper-chip { min-height: 44px; }
 }
 @media print { .helper-fab, .helper-panel { display: none; } }
+
+/* NASA satellite water data (src/fieldSummary/WaterData.jsx) */
+.water-chart { height: 200px; }
+.water-facts { margin: 0; padding-left: 18px; font-size: 14px; }
+.water-facts li { margin: 2px 0; }

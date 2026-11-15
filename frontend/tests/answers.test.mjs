@@ -87,6 +87,8 @@ test("typed words find the right question or term", () => {
     "who can I call": "talk",
     "weather this week": "week",
     "future climate 2040": "outlook",
+    "is my well running low": "groundwater",
+    "groundwater": "groundwater",
   };
   for (const [typed, id] of Object.entries(cases)) assert.deepEqual(matchQuestion(typed), { kind: "question", id }, typed);
   assert.deepEqual(matchQuestion("what is NDVI"), { kind: "term", id: "ndvi" });
@@ -95,4 +97,19 @@ test("typed words find the right question or term", () => {
   assert.equal(matchQuestion(""), null);
   assert.match(answerTerm("ndvi").paragraphs[0], /greenness/i);
   assert.ok(noMatch("x").links.includes("extension"));
+});
+
+test("groundwater answer uses the GRACE percentiles and flags a dry year", () => {
+  const water = {
+    status: "ok",
+    groundwater: { status: "ok", latest: { date: "2026-08-31", pct: 19.2 }, last_12m_avg: 14.6 },
+    root_zone: { status: "ok", latest: { date: "2026-08-31", pct: 9.4 }, last_12m_avg: 30.1 },
+  };
+  const a = answer("groundwater", { ...ready, rotation: { ...rotation, water } });
+  assert.match(text(a), /Groundwater: 19 in the week of 2026-08-31 \(dry\); 15 on average/);
+  assert.match(text(a), /Root-zone soil moisture: 9 .*very dry/);
+  assert.match(text(a), /low for a year/);
+  assert.equal(a.expert, true);
+  const missing = answer("groundwater", { ...ready, rotation: { ...rotation, water: { status: "unavailable", reason: "no login" } } });
+  assert.match(text(missing), /not available right now: no login/);
 });

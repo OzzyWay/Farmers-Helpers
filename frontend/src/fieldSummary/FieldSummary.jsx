@@ -10,6 +10,7 @@ import PriorityPicker from "./PriorityPicker.jsx";
 import RuledOut from "./RuledOut.jsx";
 import SatelliteData from "./SatelliteData.jsx";
 import StrategyCard from "./StrategyCard.jsx";
+import WaterData from "./WaterData.jsx";
 import useOutlook from "./useOutlook.js";
 import useRotation from "./useRotation.js";
 
@@ -119,6 +120,7 @@ export default function FieldSummary({ place, sectionRef, onSoilModelData, weath
 
             <h3 className="summary-section">Seen from space</h3>
             <SatelliteData ndvi={data.ndvi} />
+            <WaterData water={data.water} />
 
             <h3 className="summary-section">What the data says about this field</h3>
             <Findings findings={data.findings} />

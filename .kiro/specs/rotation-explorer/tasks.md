@@ -158,15 +158,17 @@ Order changed on 2026-11-15 after a review: the engine and API first (7–9), th
   - [x] 10.4 Write `test_ndvi.py`: parsing, quality filtering, monthly aggregation, bare-month rule, failure handling, cache
     - _Requirements: 14.1_
 
-- [ ] 11. NASA water data: IMERG, GRACE and SMAP (needs `EARTHDATA_TOKEN`)
+- [x] 11. NASA water data: IMERG, GRACE and SMAP (needs `EARTHDATA_TOKEN`)
   - [x] 11.1 With the token set in `.env`, probe the GES DISC Giovanni Time Series API for Webberwood: `GPM_3IMERGM_07_precipitation`, `GRACEDADM_CLSM0125US_7D_4_0_gws_inst`, `GRACEDADM_CLSM0125US_7D_4_0_rtzsm_inst`. Save the responses as fixtures.
     - Done 2026-11-15 (`scripts/probe_nasa_water.py`): all three answer HTTP 200 as CSV in about 2 s (metadata lines, a blank line, then `Timestamp (UTC),Data`). IMERG monthly is in mm/hr on a 0.1° grid; GRACE-DA US is weekly percentiles (%) on a 0.125° grid. Fixtures: `tests/fixtures/giovanni_imerg_monthly.csv`, `giovanni_grace_gws.csv`, `giovanni_grace_rtzsm.csv`. Needs the "NASA GESDISC DATA ARCHIVE" app approved in Earthdata Login (without it the service answers HTTP 500 `{"message":null}` and GES DISC files answer 401).
-  - [ ] 11.2 Probe SMAP through NASA AppEEARS (point sample of SPL3SMP_E or SPL4SMGP) with the same token; if it is rejected, record why and mark SMAP unavailable
-  - [ ] 11.3 Implement `services/nasa_water.py`: authenticated requests (token never logged or cached), monthly IMERG rain with trend, GRACE groundwater and root-zone percentiles, SMAP where reachable, monthly cache
+  - [x] 11.2 Probe SMAP through NASA AppEEARS (point sample of SPL3SMP_E or SPL4SMGP) with the same token; if it is rejected, record why and mark SMAP unavailable
+    - Decision 2026-11-15 (user): not probed for the deadline. AppEEARS answers asynchronously (minutes), too slow for a live page. SMAP is reported as "planned for a later version" (Req 23.3's unavailable path); GRACE root-zone and surface soil moisture cover soil wetness. Moved to Phase 2.
+  - [x] 11.3 Implement `services/nasa_water.py`: authenticated requests (token never logged or cached), monthly IMERG rain with trend, GRACE groundwater and root-zone percentiles, SMAP where reachable, monthly cache
     - _Requirements: 23.1–23.6, 23.11_
-  - [ ] 11.4 Add the groundwater finding, and add the water data to `/api/rotation`
+    - Live for Webberwood on 2026-11-15: all four series in about 2.5 s in parallel; GRACE surface soil moisture added too.
+  - [x] 11.4 Add the groundwater finding, and add the water data to `/api/rotation`
     - _Requirements: 23.9_
-  - [ ] 11.5 Write `test_nasa_water.py`: parsing, aggregation, trend, finding, missing token, rejected token, timeout
+  - [x] 11.5 Write `test_nasa_water.py`: parsing, aggregation, trend, finding, missing token, rejected token, timeout
     - _Requirements: 23.12_
 
 Note (2026-11-15): at the team's request the frontend (12, 14) was built before tasks 10-11, so the
@@ -204,7 +206,7 @@ with a layer list), fed by the /api/rotation answer through App.jsx; it is no lo
     - A plain "per decade" sentence and the clear / "no clear change" chip.
     - A hidden data table, the outlook source and Open-Meteo CC BY 4.0 credit, and the "Load 2030–2049 outlook" button with the wait message.
     - _Requirements: 17.6–17.8, 18.4, 18.5, 18.11, 18.12_
-  - [ ] 14.2 Create `SatelliteData.jsx`: the NDVI chart with bare months, IMERG rain next to POWER rain, GRACE groundwater and soil moisture percentiles, SMAP when available, each with its resolution and a plain "satellite vs model" note
+  - [x] 14.2 (NDVI in `SatelliteData.jsx`; water data in `WaterData.jsx`, checked live in the browser 2026-11-15) Create `SatelliteData.jsx`: the NDVI chart with bare months, IMERG rain next to POWER rain, GRACE groundwater and soil moisture percentiles, SMAP when available, each with its resolution and a plain "satellite vs model" note
     - _Requirements: 21.4, 21.5, 23.7, 23.8, 23.10_
   - [x] 14.3 Show monthly solar radiation in the farm-data Climate view (already fetched and cached)
   - [x] 14.4 Create `Findings.jsx` and `TermInfo.jsx` (plain-language explanations of terms, keyboard-operable)

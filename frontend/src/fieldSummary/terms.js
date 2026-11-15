@@ -15,4 +15,6 @@ export const TERMS = {
   variation: ["Year-to-year variation", "How much a value swings from one year to the next, as a percentage of its average (coefficient of variation)."],
   ndvi: ["NDVI (greenness)", "How green the ground looks from space, from about 0.1 (bare soil) to 0.9 (thick growing plants). Below 0.25 counts as bare here."],
   soil_wetness: ["Root-zone soil wetness", "How wet the soil is where roots grow, from 0 (dry) to 1 (saturated), from NASA's model."],
+  percentile: ["Percentile", "Where a value ranks among past records for the same week: 10 means only 10 out of 100 past weeks were drier, 90 means 90 out of 100 were drier."],
+  grace: ["GRACE", "Twin NASA/German satellites that weigh the water in and under the ground by measuring tiny changes in Earth's gravity. They see a region hundreds of kilometres wide, not one field."],
 };
