@@ -1336,6 +1336,7 @@ body { background: var(--bg); line-height: 1.5; }
 #depth-story .depth-scene svg { display: block; width: 100%; max-width: none; height: 100svh !important; max-height: none !important; }
 #depth-story .depth-band-label { display: none; }
 #depth-story .depth-grass { height: 25%; border-bottom: 7px solid #30251d; }
+#depth-story .depth-grass { border-bottom: 0; }
 #depth-story .depth-grass > span { display: none; }
 #depth-story .depth-grass img {
   position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
@@ -1393,6 +1394,7 @@ body { background: var(--bg); line-height: 1.5; }
 #depth-story .depth-step .eyebrow { color: #d2e5a8; }
 #depth-story .depth-step > .eyebrow { display: none; }
 #depth-story .depth-step .depth-sources { color: rgb(255 250 240 / 58%); }
+#depth-story > .landing-inner > .eyebrow { font-size: 0.68rem; }
 @media (max-width: 767px) {
   #depth-story .depth-grid { min-height: calc(5 * 68svh); }
   #depth-story .depth-scene { min-height: 420px; }
