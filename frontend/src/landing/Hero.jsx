@@ -70,9 +70,9 @@ export default function Hero() {
           <button type="button" className="btn btn-primary landing-btn" onClick={() => scrollToId("depth-story", reducedMotion)}>
             {hero.exploreLabel}
           </button>
-          <button type="button" className="btn btn-light landing-btn" onClick={() => scrollToId("map-section", reducedMotion)}>
+          <a className="btn btn-light landing-btn" href="/field-desk">
             {hero.deskLabel}
-          </button>
+          </a>
         </div>
       </div>
       <p className="hero-credit">{creditLine()}</p>

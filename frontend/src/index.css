@@ -168,6 +168,8 @@ a { color: var(--accent-text); }
   padding: 10px 14px;
 }
 .topbar-title { font-size: 17px; font-weight: 600; margin: 0; white-space: nowrap; }
+.desk-back-link { color: var(--text); font-size: 13px; font-weight: 600; text-decoration: none; }
+.desk-back-link:hover { color: var(--green); text-decoration: underline; }
 .topbar-place {
   flex-basis: 100%;
   margin: 0;
@@ -1142,6 +1144,38 @@ body { background: var(--bg); line-height: 1.5; }
 .step-card p, .benefit-card p { margin: 0; color: var(--text); }
 .rural-benefits { background: var(--green-soft); }
 .benefit-card { background: var(--card); border-left: 4px solid var(--leaf); }
+
+/* Living card backgrounds: quiet foliage stays behind the copy, while small
+   pollinators emerge when a card is explored. */
+.how-it-works, .rural-benefits {
+  position: relative; isolation: isolate; overflow: hidden;
+  background: #4f7a3d;
+  color: #f5f0df;
+}
+.how-it-works h2, .rural-benefits h2,
+.how-it-works .landing-lede, .rural-benefits .landing-lede { color: #f5f0df; }
+.how-it-works h2 { color: #fff; }
+.rural-benefits h2 { color: #fff; }
+.how-it-works .step-card h3, .rural-benefits .benefit-card h3 { color: #171b16; }
+.how-it-works::before, .rural-benefits::before {
+  position: absolute; z-index: -1; inset: 0; content: ""; opacity: 0.42; pointer-events: none;
+  background:
+    radial-gradient(ellipse 34px 12px at 8% 18%, rgb(106 151 74 / 34%) 0 48%, transparent 52%),
+    radial-gradient(ellipse 42px 14px at 92% 76%, rgb(62 113 65 / 28%) 0 48%, transparent 52%),
+    linear-gradient(112deg, transparent 0 15%, rgb(63 111 61 / 26%) 15.3% 15.8%, transparent 16.1% 100%),
+    linear-gradient(68deg, transparent 0 82%, rgb(103 148 69 / 24%) 82.3% 82.8%, transparent 83.1% 100%);
+  background-size: 220px 180px, 260px 210px, 170px 190px, 230px 230px;
+}
+.rural-benefits::before { opacity: 0.5; background-color: rgb(255 255 255 / 7%); }
+.foliage-card { position: relative; overflow: hidden; isolation: isolate; }
+.foliage-card::before {
+  position: absolute; z-index: -1; right: -18px; bottom: -25px; width: 150px; height: 130px;
+  content: ""; opacity: 0.18; transform: rotate(-18deg); pointer-events: none;
+  background:
+    radial-gradient(ellipse 36px 14px at 25% 70%, var(--leaf) 0 47%, transparent 50%),
+    radial-gradient(ellipse 42px 15px at 62% 42%, var(--green) 0 47%, transparent 50%),
+    linear-gradient(112deg, transparent 0 48%, var(--leaf) 49% 51%, transparent 52%);
+}
 
 /* Closing call to action. */
 .closing-cta { background: var(--green); color: var(--on-green); text-align: left; }
