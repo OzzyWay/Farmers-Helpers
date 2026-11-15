@@ -112,7 +112,7 @@ export default function DepthStory() {
                 ))}
               </div>
             </div>
-            <svg viewBox="0 0 400 520" role="presentation">
+            <svg viewBox="0 0 400 520" preserveAspectRatio="none" role="presentation">
               {BANDS.map((b) => (
                 <g key={b.id}>
                   <rect className="depth-band" data-active={active === b.id} x="0" y={b.y} width="400" height={b.h} fill={b.fill} />
