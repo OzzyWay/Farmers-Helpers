@@ -74,6 +74,7 @@ function initTexasDesk() {
     return grassField;
   };
   buildGrass(depthScene?.querySelector(".depth-grass"), "grass-field");
+  buildGrass($(".desk-top-grass"), "desk-top-grass-field", 120);
   buildGrass($(".landing-hero"), "hero-grass-field", 150);
   let targetProgress = 0;
   let displayedProgress = 0;
@@ -231,6 +232,7 @@ function openDesk() {
   $("#header-begin").textContent = "Back to home";
   $("#assistant-toggle").hidden = false;
   window.scrollTo({ top: 0, behavior: "smooth" });
+  window.setTimeout(() => $("#desk").focus(), 0);
   setTimeout(() => texasMap.invalidateSize(), 100);
 }
 
@@ -242,6 +244,7 @@ function openLanding() {
   $("#assistant").classList.remove("open");
   $("#assistant-toggle").hidden = true;
   window.scrollTo({ top: 0, behavior: "smooth" });
+  window.setTimeout(() => $("#landing").focus(), 0);
 }
 
 function toggleAssistant() {
@@ -524,6 +527,7 @@ function renderCrops() {
 
 document.querySelectorAll("#crop-tabs button").forEach((b) => b.addEventListener("click", () => {
   document.querySelectorAll("#crop-tabs button").forEach((x) => x.setAttribute("aria-selected", String(x === b)));
+  $("#crops").setAttribute("aria-labelledby", b.id);
   cropFilter = b.dataset.filter;
   if (report) renderCrops();
 }));

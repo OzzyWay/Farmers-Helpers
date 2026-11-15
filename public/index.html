@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="style.css?v=14">
 </head>
 <body>
+  <a class="skip-link" href="#landing">Skip to main content</a>
   <header class="top">
     <div class="wrap top-inner">
       <a class="brand" href="#home" id="brand-home"><span class="brand-mark" aria-hidden="true">FH</span>Farmers Helpers</a>
@@ -19,7 +20,7 @@
     </div>
   </header>
 
-  <main id="landing">
+  <main id="landing" tabindex="-1">
     <section class="landing-hero" id="home">
       <img class="hero-image" src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=2200&q=85" alt="Open green fields and grass beneath a wide U.S. sky">
       <div class="hero-shade"></div>
@@ -103,8 +104,9 @@
     </section>
   </main>
 
-  <main id="desk" hidden>
+  <main id="desk" hidden tabindex="-1">
     <section class="desk wrap" id="texas-desk">
+      <div class="desk-top-grass" aria-hidden="true"></div>
       <div class="desk-heading">
         <div><p class="eyebrow">U.S. field desk</p><h1>Conditions across the country</h1></div>
         <span class="demo-tag"><i></i>Regional demo snapshot</span>
@@ -122,13 +124,13 @@
             <div><p class="eyebrow">GPS map · U.S. coverage</p><h2 id="map-title">United States</h2></div>
             <button type="button" id="locate-farm" class="locate-button" title="Use your device location">◎ <span>Use my location</span></button>
           </div>
-          <div id="texas-map" role="application" aria-label="Zoomable map of U.S. agricultural regions"></div>
+          <div id="texas-map" role="region" aria-labelledby="map-title" aria-describedby="map-note"></div>
           <div class="map-legend" aria-label="Map legend">
             <span><i class="legend-pin extension">E</i>Extension</span>
             <span><i class="legend-pin water">W</i>Water support</span>
             <span><i class="legend-pin supply">S</i>Farm supply</span>
           </div>
-          <p class="map-note">Street map by OpenStreetMap. Region conditions and sample support markers are illustrative.</p>
+          <p class="map-note" id="map-note">Street map by OpenStreetMap. Region conditions and sample support markers are illustrative. Use the map controls or select a region for details.</p>
         </section>
         <aside class="card region-panel" aria-live="polite" aria-labelledby="region-name">
           <div class="region-panel-head">
@@ -165,14 +167,14 @@
       <section class="card">
         <div class="card-head">
           <h3>What to plant</h3>
-          <div class="tabs" role="tablist" id="crop-tabs">
-            <button role="tab" data-filter="now" aria-selected="true">Plant now</button>
-            <button role="tab" data-filter="soon">Coming up</button>
-            <button role="tab" data-filter="later">Later this year</button>
-            <button role="tab" data-filter="calendar">Calendar</button>
+          <div class="tabs" role="tablist" id="crop-tabs" aria-label="Crop timing views">
+            <button type="button" role="tab" id="tab-now" aria-controls="crops" data-filter="now" aria-selected="true">Plant now</button>
+            <button type="button" role="tab" id="tab-soon" aria-controls="crops" data-filter="soon" aria-selected="false">Coming up</button>
+            <button type="button" role="tab" id="tab-later" aria-controls="crops" data-filter="later" aria-selected="false">Later this year</button>
+            <button type="button" role="tab" id="tab-calendar" aria-controls="crops" data-filter="calendar" aria-selected="false">Calendar</button>
           </div>
         </div>
-        <div id="crops"></div>
+        <div id="crops" role="tabpanel" aria-labelledby="tab-now" tabindex="0"></div>
       </section>
       <div class="grid-2">
         <section class="card"><div class="card-head"><h3>Your climate, month by month</h3><span class="muted small">NASA POWER, long-term average</span></div><div class="chart-box"><canvas id="climate-chart"></canvas></div></section>

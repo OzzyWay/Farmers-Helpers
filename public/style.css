@@ -1040,6 +1040,38 @@ body { background: var(--bg); color: var(--ink); }
   height: 32%;
   pointer-events: auto;
 }
+.desk-top-grass {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 92px;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(30, 52, 32, 0.88), rgba(44, 69, 39, 0.12));
+  border-bottom: 1px solid rgba(220, 232, 190, 0.25);
+  pointer-events: none;
+}
+.desk-top-grass-field {
+  position: absolute;
+  z-index: 1;
+  top: -1px;
+  right: 0;
+  left: 0;
+  height: 100%;
+  overflow: hidden;
+  opacity: 0.96;
+  filter: drop-shadow(0 4px 8px rgba(20, 42, 20, 0.32));
+}
+.desk-top-grass-field .grass-blade {
+  top: -5%;
+  bottom: auto;
+  height: clamp(30px, 8vh, 76px);
+  transform-origin: top center;
+}
+.desk-top-grass-field .grass-blade:nth-child(3n) { transform: rotate(calc(var(--lean) * -1)); }
+.desk-top-grass-field .grass-blade:nth-child(4n) { opacity: 0.88; }
+.desk-top-grass-field .grass-blade:nth-child(5n) { filter: brightness(1.12); }
 .grass-blade {
   position: absolute;
   bottom: -5%;
@@ -1197,4 +1229,97 @@ body { background: var(--bg); color: var(--ink); }
 @media (prefers-reduced-motion: reduce) {
   .steps article, .steps article:hover { transform: none; }
   .steps article:hover .card-bug { animation: none; offset-distance: 18%; }
+}
+
+/* Accessibility and shared field-desk language. */
+.skip-link {
+  position: fixed;
+  z-index: 2000;
+  top: 8px;
+  left: 8px;
+  padding: 9px 13px;
+  transform: translateY(-150%);
+  border-radius: 3px;
+  background: #fff9ed;
+  color: #233328;
+  font-weight: 700;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.28);
+}
+.skip-link:focus { transform: translateY(0); }
+:where(a, button, input, [role="tab"], .leaflet-control a):focus-visible {
+  outline: 3px solid #d9e8a8;
+  outline-offset: 3px;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* The desk is the practical continuation of the soil story on the home page. */
+#desk {
+  min-height: 100vh;
+  background:
+    linear-gradient(rgba(36, 30, 25, 0.92), rgba(36, 30, 25, 0.92)),
+    radial-gradient(circle at 12% 8%, rgba(123, 151, 83, 0.22), transparent 28%),
+    #241e19;
+  color: #f8f3e9;
+}
+#desk .desk { position: relative; padding-top: 54px; }
+#desk .desk-heading,
+#desk .lookup,
+#desk > .desk > .status,
+#desk .desk-grid { position: relative; z-index: 3; }
+#desk .desk::before {
+  position: absolute;
+  top: 0;
+  right: 16px;
+  left: 16px;
+  height: 7px;
+  background: repeating-linear-gradient(90deg, #65794c 0 18px, #9b885c 18px 22px, #4b6340 22px 39px);
+  content: "";
+}
+#desk .desk-heading h1 { color: #fff9ed; font-size: clamp(2.2rem, 4vw, 3.5rem); letter-spacing: -0.03em; }
+#desk .desk-heading .eyebrow { color: #c7d3aa; }
+#desk .demo-tag { color: rgba(248,243,233,0.72); }
+#desk .demo-tag i { background: #d3ba8e; }
+#desk .lookup {
+  max-width: 760px;
+  border-color: #80664d;
+  border-radius: 5px;
+  background: #fff9ed;
+  box-shadow: 0 8px 20px rgba(20, 13, 8, 0.18);
+}
+#desk .lookup input { color: #22231f; }
+#desk .lookup input::placeholder { color: #686459; opacity: 1; }
+#desk .lookup-mark { color: #385943; }
+#desk .lookup button, #desk .region-action { background: #5f7d49; }
+#desk .lookup button:hover, #desk .region-action:hover { background: #789957; }
+#desk > .desk > .status { color: #e2e8d0; }
+#desk > .desk > .status.error { color: #f2c2a9; }
+#desk .texas-map-card, #desk .region-panel {
+  border-color: #80664d;
+  border-radius: 6px;
+  background: #f8f3e9;
+  color: #22231f;
+  box-shadow: 0 12px 34px rgba(20, 13, 8, 0.2);
+}
+#desk .texas-map-card { overflow: hidden; }
+#desk .map-heading { padding-top: 2px; }
+#desk .map-heading .eyebrow, #desk .region-panel .eyebrow { color: #76533a; }
+#desk #texas-map { border-color: #80664d; }
+#desk .map-note { color: #5f5b52; }
+#desk .condition-tag.dry { color: #6d402b; }
+#desk .region-action { color: #fff; }
+#desk .region-panel .region-action:focus-visible { outline-color: #385943; }
+#desk #report { color: #22231f; }
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-sun, .hero-shade, .depth-title, .grass-blade, .spinner { animation: none !important; transition: none !important; }
 }
