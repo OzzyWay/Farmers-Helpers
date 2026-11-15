@@ -29,18 +29,6 @@ export default function DepthStory() {
   const sceneRef = useRef(null);
 
   useEffect(() => {
-    if (typeof IntersectionObserver === "undefined") return undefined; // step one stays highlighted
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) if (e.isIntersecting) setActive(e.target.dataset.step);
-      },
-      { rootMargin: "-45% 0px -45% 0px" }
-    );
-    stepRefs.current.forEach((el) => el && observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
     const scene = sceneRef.current;
     if (!scene) return undefined;
 
