@@ -44,6 +44,10 @@ SMAP_L4_PRODUCT_ID = "SPL4SMGP"
 SMAP_L4_CRS = "EPSG:6933"
 
 
+class MissingCRSError(ValueError):
+    """Raised when a raster has no recognized coordinate reference system."""
+
+
 def _file_id(identity: str) -> str:
     return hashlib.sha256(identity.encode("utf-8")).hexdigest()[:20]
 
@@ -259,7 +263,7 @@ def _spatial_reference(dataset, name: str):
         or tags.get("Metadata_SeriesIdentification_shortName")
     )
     if product_id != SMAP_L4_PRODUCT_ID:
-        raise ValueError(f"{name} has no CRS")
+        raise MissingCRSError(f"{name} has no CRS")
 
     try:
         width = int(tags["Metadata_GridSpatialRepresentation_Longitude_dimensionSize"])
@@ -269,7 +273,7 @@ def _spatial_reference(dataset, name: str):
         south = float(tags["Metadata_Extent_southBoundLatitude"])
         north = float(tags["Metadata_Extent_northBoundLatitude"])
     except (KeyError, TypeError, ValueError) as error:
-        raise ValueError(f"{name} has no CRS") from error
+        raise MissingCRSError(f"{name} has no CRS") from error
 
     if (
         (width, height) != (dataset.width, dataset.height)
@@ -277,7 +281,7 @@ def _spatial_reference(dataset, name: str):
         or not (math.isclose(west, -180) and math.isclose(east, 180))
         or not (math.isclose(south, -north) and -90 < south < 0 < north < 90)
     ):
-        raise ValueError(f"{name} has no CRS")
+        raise MissingCRSError(f"{name} has no CRS")
 
     x_bounds, _ = transform("EPSG:4326", SMAP_L4_CRS, [west, east], [0, 0])
     _, y_bounds = transform("EPSG:4326", SMAP_L4_CRS, [0, 0], [south, north])
@@ -448,6 +452,7 @@ class RasterOverlayService:
     def __init__(self) -> None:
         self._lock = threading.RLock()
         self._assets: dict[str, dict] = {}
+        self._assets_without_crs: set[str] = set()
         self._asset_locks: dict[str, threading.Lock] = {}
         self._download_locks: dict[str, threading.Lock] = {}
         self._scanned_at = 0.0
@@ -589,6 +594,8 @@ class RasterOverlayService:
 
             groups: dict[str, list[dict]] = {}
             for asset in self._assets.values():
+                if asset["id"] in self._assets_without_crs:
+                    continue
                 groups.setdefault(asset["series_key"], []).append(asset)
             result = []
             for records in groups.values():
@@ -612,6 +619,8 @@ class RasterOverlayService:
     def asset(self, asset_id: str) -> dict:
         self.catalog()
         with self._lock:
+            if asset_id in self._assets_without_crs:
+                raise MissingCRSError("Raster has no CRS")
             try:
                 asset = self._assets[asset_id]
             except KeyError as exc:
@@ -620,12 +629,17 @@ class RasterOverlayService:
         with asset_lock:
             path = self._download(asset)
             if not asset["variables"]:
-                metadata = _asset_metadata(
-                    path, asset["identity"], asset["dataset"], asset["name"],
-                    asset["modified"], asset.get("overrides"),
-                    date_source=asset.get("repo_path"),
-                    series_key_source=asset.get("repo_path") if asset["kind"] == "huggingface" else None,
-                )
+                try:
+                    metadata = _asset_metadata(
+                        path, asset["identity"], asset["dataset"], asset["name"],
+                        asset["modified"], asset.get("overrides"),
+                        date_source=asset.get("repo_path"),
+                        series_key_source=asset.get("repo_path") if asset["kind"] == "huggingface" else None,
+                    )
+                except MissingCRSError:
+                    with self._lock:
+                        self._assets_without_crs.add(asset_id)
+                    raise
                 asset.update(metadata)
                 asset["id"] = asset_id
                 asset["source_type"] = (

@@ -10,6 +10,31 @@ function tileUrl(overlay) {
   return `/api/rasters/${overlay.rasterId}/tiles/{z}/{x}/{y}.png?band=${overlay.band}&ramp=${overlay.ramp}`;
 }
 
+function createOverlay(raster) {
+  const initialRecord = raster.records[0];
+  return {
+    uid: `${raster.id}-${Date.now()}`,
+    rasterId: initialRecord?.id || raster.id,
+    band: raster.variables[0]?.index || 1,
+    visible: true,
+    opacity: 0.75,
+    ramp: "viridis",
+    records: raster.records,
+    date: initialRecord?.datetime || raster.datetime || "",
+    noObservation: false,
+    asset: null,
+    loading: false,
+    detailsError: null,
+  };
+}
+
+function loadRasterCatalog() {
+  return fetch("/api/rasters").then((response) => {
+    if (!response.ok) throw new Error(`Map layer list could not be loaded (HTTP ${response.status})`);
+    return response.json();
+  });
+}
+
 function Legend({ overlay, raster, variable }) {
   if (!overlay.visible || overlay.noObservation || overlay.loading ||
       overlay.asset?.id !== overlay.rasterId || !variable) return null;
@@ -67,16 +92,21 @@ export default function RasterOverlayPanel({ map }) {
 
   useEffect(() => {
     let cancelled = false;
-    fetch("/api/rasters")
-      .then((response) => {
-        if (!response.ok) throw new Error(`Map layer list could not be loaded (HTTP ${response.status})`);
-        return response.json();
-      })
+    loadRasterCatalog()
       .then((data) => {
         if (!cancelled) {
-          setCatalog(data.rasters || []);
+          const rasters = data.rasters || [];
+          const defaultRaster = rasters.find((raster) =>
+            raster.source_family === "SMAP" &&
+            raster.catalog_entry?.layer_header === "Geophysical_Data_soil_temp_layer1"
+          );
+          setCatalog(rasters);
           setCatalogWarnings(data.warnings || []);
-          setSelectedId(data.rasters?.[0]?.id || "");
+          setSelectedId(defaultRaster?.id || rasters[0]?.id || "");
+          if (defaultRaster) {
+            setOverlays((current) => current.length ? current : [createOverlay(defaultRaster)]);
+            setOpen(true);
+          }
         }
       })
       .catch((cause) => {
@@ -122,22 +152,7 @@ export default function RasterOverlayPanel({ map }) {
   function addOverlay() {
     const raster = overlayById.get(visibleSelectedId);
     if (!raster) return;
-    const initialRecord = raster.records[0];
-    const overlay = {
-      uid: `${raster.id}-${Date.now()}`,
-      rasterId: initialRecord?.id || raster.id,
-      band: raster.variables[0]?.index || 1,
-      visible: true,
-      opacity: 0.75,
-      ramp: "viridis",
-      records: raster.records,
-      date: initialRecord?.datetime || raster.datetime || "",
-      noObservation: false,
-      asset: null,
-      loading: false,
-      detailsError: null,
-    };
-    setOverlays((current) => [...current, overlay]);
+    setOverlays((current) => [...current, createOverlay(raster)]);
     setOpen(true);
   }
 
@@ -179,6 +194,23 @@ export default function RasterOverlayPanel({ map }) {
         })
         .catch((cause) => {
           if (detailRequests.current.get(overlay.uid) === overlay.rasterId) {
+            if (cause.message?.toLowerCase().includes("has no crs")) {
+              detailRequests.current.delete(overlay.uid);
+              setOverlays((current) => current.filter((item) => item.uid !== overlay.uid));
+              setCatalog((current) => current.filter((item) =>
+                !item.records.some((record) => record.id === overlay.rasterId)
+              ));
+              setError("Removed this map layer because it has no CRS.");
+              loadRasterCatalog()
+                .then((data) => {
+                  setCatalog(data.rasters || []);
+                  setCatalogWarnings(data.warnings || []);
+                })
+                .catch((refreshCause) => {
+                  setError(refreshCause.message || "Could not refresh map layers");
+                });
+              return;
+            }
             updateOverlay(overlay.uid, { loading: false, detailsError: cause.message });
             setError(cause.message || "Could not load the selected map layer");
           }

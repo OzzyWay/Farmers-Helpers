@@ -228,6 +228,67 @@ def test_hugging_face_download_occurs_only_when_asset_is_selected(tmp_path, monk
     assert "Units: K" in asset["description"]
 
 
+def test_hugging_face_rasters_without_crs_are_removed_from_catalog(tmp_path, monkeypatch):
+    missing_crs_path = tmp_path / "missing-crs.tif"
+    with rasterio.open(
+        missing_crs_path,
+        "w",
+        driver="GTiff",
+        width=2,
+        height=2,
+        count=1,
+        dtype="float32",
+        transform=from_bounds(-1, -1, 1, 1, 2, 2),
+    ) as dataset:
+        dataset.write(np.ones((2, 2), dtype=np.float32), 1)
+
+    valid_path = tmp_path / "valid.tif"
+    with rasterio.open(
+        valid_path,
+        "w",
+        driver="GTiff",
+        width=2,
+        height=2,
+        count=1,
+        dtype="float32",
+        crs="EPSG:4326",
+        transform=from_bounds(-1, -1, 1, 1, 2, 2),
+    ) as dataset:
+        dataset.write(np.ones((2, 2), dtype=np.float32), 1)
+
+    siblings = [
+        SimpleNamespace(rfilename="ECOSTRESS/2018-07-28__SDS_Emis2.tif", blob_id="bad", size=100),
+        SimpleNamespace(rfilename="GPM/2024-01-01__Grid_precipitation.tif", blob_id="good", size=100),
+    ]
+
+    class FakeHfApi:
+        def __init__(self, token):
+            pass
+
+        def dataset_info(self, repo_id, files_metadata):
+            return SimpleNamespace(sha="revision", siblings=siblings)
+
+    def fake_download(**kwargs):
+        return str(missing_crs_path if "ECOSTRESS" in kwargs["filename"] else valid_path)
+
+    monkeypatch.setenv("HF_TOKEN", "test-token")
+    local_rasters = tmp_path / "local"
+    local_rasters.mkdir()
+    monkeypatch.setenv("RASTER_DATA_DIRS", str(local_rasters))
+    monkeypatch.setattr("huggingface_hub.HfApi", FakeHfApi)
+    monkeypatch.setattr("huggingface_hub.hf_hub_download", fake_download)
+
+    service = RasterOverlayService()
+    initial_catalog = service.catalog()
+    ecostress_record = next(item for item in initial_catalog if item["source_family"] == "ECOSTRESS")
+
+    with pytest.raises(ValueError, match="has no CRS"):
+        service.asset(ecostress_record["records"][0]["id"])
+
+    assert [item["source_family"] for item in service.catalog()] == ["GPM"]
+    assert [item["source_family"] for item in service.catalog(refresh=True)] == ["GPM"]
+
+
 def test_smap_raster_without_geotiff_crs_uses_embedded_ease_grid_metadata(tmp_path, monkeypatch):
     raster_path = tmp_path / "smap.tif"
     width, height = 3856, 1624
