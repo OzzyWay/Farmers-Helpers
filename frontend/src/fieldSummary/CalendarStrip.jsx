@@ -1,5 +1,6 @@
-import { MONTH_FULL, MONTH_NAMES } from "../farmData/format.js";
+import { MONTH_FULL } from "../farmData/format.js";
 import { cropColor, cropName } from "./labels.js";
+import MonthName from "./MonthName.jsx";
 
 /**
  * Month-by-month view of a rotation: what is in the ground, and when the soil is bare.
@@ -16,7 +17,7 @@ export default function CalendarStrip({ calendar, crops }) {
       {calendar.map((year, yi) => (
         <div key={yi} className="cal-year">
           {multiYear && <div className="cal-year-label">Year {yi + 1}</div>}
-          <ol className="cal-row" aria-label={multiYear ? `Year ${yi + 1} of the rotation` : "The year, month by month"}>
+          <ol className="cal-row month-row" aria-label={multiYear ? `Year ${yi + 1} of the rotation` : "The year, month by month"}>
             {year.map((cell) => {
               const names = cell.crop_ids.map((c) => cropName(crops, c));
               const flags = [cell.heat && "heat-stress month", cell.frost && "frost possible", cell.wettest && "wettest month"].filter(Boolean);
@@ -24,7 +25,7 @@ export default function CalendarStrip({ calendar, crops }) {
               const label = `${MONTH_FULL[cell.month - 1]}: ${cover}${flags.length ? `, ${flags.join(", ")}` : ""}`;
               return (
                 <li key={cell.month} className={`cal-cell${cell.bare ? " bare" : ""}`} aria-label={label} title={label}>
-                  <span className="cal-month" aria-hidden="true">{MONTH_NAMES[cell.month - 1][0]}</span>
+                  <span className="cal-month" aria-hidden="true"><MonthName month={cell.month} /></span>
                   <span className="cal-bands" aria-hidden="true">
                     {cell.bare ? (
                       <span className="cal-bare">Bare</span>

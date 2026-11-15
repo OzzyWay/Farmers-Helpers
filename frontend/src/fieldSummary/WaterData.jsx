@@ -11,9 +11,11 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useRef } from "react";
 import { useThemeColors } from "../farmData/ClimateChart.jsx";
 import { MONTH_FULL, MONTH_NAMES, formatNumber } from "../farmData/format.js";
 import usePrefersReducedMotion from "../farmData/usePrefersReducedMotion.js";
+import { useElementSize } from "../layoutHooks.js";
 import TermInfo from "./TermInfo.jsx";
 
 const GW_COLOR = "#2f6db5";
@@ -50,12 +52,16 @@ export default function WaterData({ water }) {
 }
 
 function RainCompare({ rain, c, tick, reducedMotion }) {
+  const chartRef = useRef(null);
+  const { width } = useElementSize(chartRef);
+  const wide = width >= 840; // 12 groups x about 70 px each fit "September"
   if (!rain || rain.status !== "ok") {
     return <p className="note">Satellite rain (IMERG) is not available here: {rain?.reason || "no data"}.</p>;
   }
   const cmp = rain.calendar_vs_power;
-  const rows = MONTH_NAMES.map((m, i) => ({
+  const rows = MONTH_FULL.map((m, i) => ({
     month: m,
+    short: MONTH_NAMES[i],
     imerg: cmp ? cmp.imerg_mm?.[i] : rain.calendar?.[i],
     power: cmp ? cmp.power_mm?.[i] : null,
   }));
@@ -68,12 +74,13 @@ function RainCompare({ rain, c, tick, reducedMotion }) {
         Average rain in each month, {period}: NASA GPM IMERG (satellites, about {Math.round(rain.resolution_m / 1000)} km)
         next to NASA POWER (model, about 50 km). {rain.note}
       </p>
-      <div className="water-chart" aria-hidden="true">
+      <div className="water-chart" aria-hidden="true" ref={chartRef}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={rows} margin={{ top: 6, right: 8, bottom: 0, left: 0 }}>
             <CartesianGrid vertical={false} stroke={c["--divider"]} />
+            {/* Full month names when each bar group has room (about 70 px), else "Jan", "Feb"... */}
             <XAxis dataKey="month" tick={tick} tickLine={false} axisLine={false} interval={0}
-              tickFormatter={(m) => m[0]} />
+              tickFormatter={(m, i) => (wide ? m : rows[i]?.short ?? m)} />
             <YAxis tick={tick} tickLine={false} axisLine={false} width={36} unit="" />
             <Tooltip cursor={{ fill: c["--divider"] }} content={<RainTip />} />
             <Legend wrapperStyle={{ fontSize: 12 }} />
@@ -98,7 +105,7 @@ function RainCompare({ rain, c, tick, reducedMotion }) {
         <thead><tr><th scope="col">Month</th><th scope="col">IMERG (mm)</th><th scope="col">NASA POWER (mm)</th></tr></thead>
         <tbody>
           {rows.map((r, i) => (
-            <tr key={r.month}><th scope="row">{MONTH_FULL[i]}</th><td>{fmt(r.imerg)}</td><td>{fmt(r.power)}</td></tr>
+            <tr key={r.month}><th scope="row">{r.month}</th><td>{fmt(r.imerg)}</td><td>{fmt(r.power)}</td></tr>
           ))}
         </tbody>
       </table>

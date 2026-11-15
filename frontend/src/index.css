@@ -571,6 +571,44 @@ a { color: var(--accent-text); }
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   align-items: start;
 }
+.scenario-explorer {
+  padding: clamp(16px, 3vw, 26px); border: 1px solid var(--divider); border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--surface-solid), var(--surface-sunken)); box-shadow: var(--shadow);
+}
+.scenario-intro { display: flex; justify-content: space-between; align-items: flex-end; gap: 18px; }
+.scenario-intro h3 { margin: 2px 0 6px; font-size: clamp(20px, 3vw, 26px); }
+.scenario-intro p:not(.scenario-kicker) { margin: 0; max-width: 66ch; color: var(--text-secondary); line-height: 1.45; }
+.scenario-kicker { margin: 0; color: var(--accent-text); font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+.scenario-switch { display: flex; flex: 0 0 auto; flex-wrap: wrap; gap: 6px; padding: 4px; border: 1px solid var(--divider); border-radius: var(--radius-pill); background: var(--surface-sunken); }
+.scenario-switch button { min-height: 40px; padding: 8px 14px; border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--text); font: 600 13px var(--font); cursor: pointer; }
+.scenario-switch button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+.scenario-switch button:disabled { opacity: 0.45; cursor: not-allowed; }
+.scenario-switch button:focus-visible { outline: 3px solid var(--leaf); outline-offset: 2px; }
+.scenario-status { margin: 14px 0 0; padding: 10px 12px; border-radius: 10px; background: var(--warn-soft); font-size: 14px; }
+.scenario-leader { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: 18px; padding: 16px; border-radius: 14px; background: var(--green); color: var(--on-green); }
+.scenario-leader > div:first-child { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.scenario-label, .scenario-meta { font-size: 12px; opacity: 0.86; }
+.scenario-leader strong { font-size: 19px; }
+.scenario-score { flex: 0 0 auto; white-space: nowrap; }
+.scenario-score strong { font-size: 34px; line-height: 1; font-variant-numeric: tabular-nums; }
+.scenario-score span { margin-left: 3px; font-size: 13px; opacity: 0.85; }
+.scenario-dimensions { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin-top: 10px; }
+.scenario-dimension { display: flex; flex-direction: column; gap: 3px; min-width: 0; padding: 10px; border: 1px solid var(--divider); border-radius: 10px; background: var(--surface-solid); }
+.scenario-dimension > span { color: var(--text-secondary); font-size: 12px; }
+.scenario-dimension strong { font-variant-numeric: tabular-nums; }
+.scenario-dimension strong span { color: var(--text-secondary); font-size: 12px; }
+.scenario-dimension small { font-weight: 600; font-variant-numeric: tabular-nums; }
+.scenario-dimension .improved { color: var(--green); }
+.scenario-dimension .declined { color: var(--error); }
+.scenario-dimension .unchanged { color: var(--text-secondary); }
+.scenario-ranking { display: grid; gap: 6px; margin: 12px 0 0; padding: 0; list-style: none; }
+.scenario-ranking li { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto minmax(130px, 0.65fr); align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--divider); border-radius: 10px; background: var(--surface-solid); }
+.scenario-ranking li.is-leader { border-color: var(--accent); }
+.scenario-rank { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--surface-sunken); font-size: 12px; font-weight: 700; }
+.scenario-name { min-width: 0; font-weight: 600; }
+.scenario-row-score { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.scenario-shift { color: var(--text-secondary); font-size: 12px; text-align: right; }
+.scenario-footnote { margin: 12px 0 0; color: var(--text-secondary); font-size: 12px; line-height: 1.45; }
 .strategy { display: flex; flex-direction: column; gap: 12px; background: var(--surface-solid); box-shadow: var(--shadow); }
 .strategy.current { border: 2px solid var(--control-border); }
 .strategy.best { border: 2px solid var(--accent); }
@@ -625,6 +663,52 @@ a { color: var(--accent-text); }
 .cal-swatch.hatch {
   border: 1px dashed var(--control-border);
   background: repeating-linear-gradient(45deg, transparent 0 3px, var(--divider) 3px 6px);
+}
+
+/* Season-by-season rotation plan */
+.season-plan { display: flex; flex-direction: column; gap: 12px; }
+.season-plan-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+.season-plan-head > div { min-width: 0; }
+.season-plan-head h4 { margin: 2px 0 0; font-size: 19px; }
+.season-plan-head > p { max-width: 42ch; margin: 0; color: var(--text-secondary); font-size: 12px; line-height: 1.4; }
+.plan-kicker { margin: 0; color: var(--accent-text); font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+.plan-year { display: flex; flex-direction: column; gap: 9px; }
+.plan-year-title { margin: 8px 0 0; font-size: 14px; }
+.season-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+.season-card { --season-accent: var(--green); padding: 12px; border: 1px solid var(--divider); border-left: 4px solid var(--season-accent); border-radius: 12px; background: var(--surface-sunken); }
+.season-spring { --season-accent: #448b43; }
+.season-summer { --season-accent: #ce7c19; }
+.season-fall { --season-accent: #a66335; }
+.season-winter { --season-accent: #547eac; }
+.season-title-row { display: flex; align-items: center; gap: 9px; }
+.season-index { display: grid; place-items: center; flex: 0 0 32px; height: 32px; border-radius: 50%; background: var(--season-accent); color: #fff; font-size: 11px; font-weight: 700; }
+.season-title-row p { margin: 0; color: var(--text-secondary); font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+.season-title-row h5 { margin: 1px 0 0; font-size: 18px; }
+.season-suggestion { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; align-items: baseline; margin: 10px 0; padding: 10px 12px; border-radius: 10px; background: var(--surface-solid); }
+.season-suggestion > span { color: var(--text-secondary); font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+.season-suggestion > strong { grid-column: 1 / -1; font-size: clamp(20px, 5vw, 26px); line-height: 1.15; }
+.season-suggestion > p { grid-column: 1 / -1; margin: 2px 0 0; font-size: 14px; line-height: 1.4; }
+.season-suggestion > p strong { color: var(--accent-text); }
+.season-crops { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 9px; }
+.season-crop { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 4px 9px; border: 1px solid var(--divider); border-radius: var(--radius-pill); background: var(--surface-solid); font-size: 12px; font-weight: 600; }
+.plan-crop-icon { display: inline-grid; place-items: center; flex: 0 0 30px; width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--divider); background: var(--surface-sunken); background: color-mix(in srgb, var(--crop-color) 16%, var(--surface-solid)); font-size: 17px; line-height: 1; }
+.plan-crop-icon.compact { flex-basis: 20px; width: 20px; height: 20px; border: 0; background: transparent; font-size: 14px; }
+.season-no-crop { color: var(--text-secondary); font-size: 12px; }
+.season-months { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; margin: 0; padding: 0; list-style: none; }
+.season-months li { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 0; min-height: 66px; padding: 5px 2px; border: 1px solid var(--divider); border-radius: 8px; background: var(--surface-solid); text-align: center; }
+.season-months li.bare { background: repeating-linear-gradient(135deg, var(--surface-solid) 0 5px, var(--surface-sunken) 5px 9px); }
+.season-months li.satellite-bare { border-style: dashed; }
+.season-months li > span:first-child { font-size: 11px; font-weight: 700; }
+.season-month-icons { display: flex; justify-content: center; gap: 0; min-height: 20px; }
+.season-month-empty { color: var(--text-secondary); font-size: 16px; line-height: 20px; }
+.season-months small { color: var(--text-secondary); font-size: 9px; line-height: 1.1; }
+.season-notes { display: flex; flex-direction: column; gap: 6px; margin-top: 9px; }
+.season-notes p { margin: 0; padding-top: 7px; border-top: 1px solid var(--divider); color: var(--text-secondary); font-size: 12px; line-height: 1.4; }
+.season-notes strong { display: block; margin-bottom: 2px; color: var(--text); font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; }
+.plan-satellite-note { margin: 0; color: var(--text-secondary); font-size: 11px; line-height: 1.4; }
+@media (max-width: 767px) {
+  .season-plan-head { align-items: flex-start; flex-direction: column; }
+  .season-plan-head > p { max-width: none; }
 }
 
 /* Score bars */
@@ -932,6 +1016,11 @@ body { background: var(--bg); line-height: 1.5; }
 .ext-note { font-size: 0.82em; opacity: 0.85; margin-left: 4px; }
 
 @media (max-width: 767px) {
+  .scenario-intro { align-items: stretch; flex-direction: column; }
+  .scenario-switch { align-self: stretch; }
+  .scenario-switch button { flex: 1 1 140px; }
+  .scenario-ranking li { grid-template-columns: 28px minmax(0, 1fr) auto; gap: 8px; }
+  .scenario-shift { grid-column: 2 / -1; text-align: left; }
   .landing-section { padding: 44px 14px; }
   .hero { min-height: 92vh; min-height: 92dvh; padding-bottom: 48px; }
   .depth-grid { grid-template-columns: 1fr; gap: 16px; }
@@ -1125,3 +1214,13 @@ body { background: var(--bg); line-height: 1.5; }
 .water-chart { height: 200px; }
 .water-facts { margin: 0; padding-left: 18px; font-size: 14px; }
 .water-facts li { margin: 2px 0; }
+
+/* Month names in month rows (src/fieldSummary/MonthName.jsx): the full name when the month's box
+   is wide enough, the 3-letter name when it is narrow (phones, small cards). */
+.month-row > li { container-type: inline-size; } /* each month's own box decides */
+.month-short { display: none; }
+@container (max-width: 72px) { /* "September" needs about 65 px */
+  .month-full { display: none; }
+  .month-short { display: inline; }
+}
+.ndvi-cell .cal-month, .cal-cell .cal-month { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

@@ -10,8 +10,9 @@ import {
   YAxis,
 } from "recharts";
 import { useThemeColors } from "../farmData/ClimateChart.jsx";
-import { MONTH_FULL, MONTH_NAMES, formatNumber } from "../farmData/format.js";
+import { MONTH_FULL, formatNumber } from "../farmData/format.js";
 import usePrefersReducedMotion from "../farmData/usePrefersReducedMotion.js";
+import MonthName from "./MonthName.jsx";
 import TermInfo from "./TermInfo.jsx";
 
 /**
@@ -75,13 +76,13 @@ export default function SatelliteData({ ndvi }) {
       </div>
 
       <h4 className="trend-title">Typical greenness by month</h4>
-      <ol className="ndvi-months" aria-label="Typical greenness by month">
+      <ol className="ndvi-months month-row" aria-label="Typical greenness by month">
         {ndvi.monthly.map((m) => {
           const isBare = bare.includes(m.month);
           const label = `${MONTH_FULL[m.month - 1]}: ${m.typical_ndvi == null ? "no clear view" : `NDVI ${formatNumber(m.typical_ndvi, 2)}`}${isBare ? ", looked bare in most years" : ""}`;
           return (
             <li key={m.month} className={`ndvi-cell${isBare ? " bare" : ""}`} aria-label={label} title={label}>
-              <span className="cal-month" aria-hidden="true">{MONTH_NAMES[m.month - 1][0]}</span>
+              <span className="cal-month" aria-hidden="true"><MonthName month={m.month} /></span>
               <span className="ndvi-swatch" aria-hidden="true"
                 style={m.typical_ndvi == null ? {} : { background: greenness(m.typical_ndvi), color: m.typical_ndvi > 0.55 ? "#fff" : "#1d1d1f" }}>
                 {isBare ? "Bare" : m.typical_ndvi == null ? "–" : formatNumber(m.typical_ndvi, 1)}

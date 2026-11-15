@@ -147,7 +147,7 @@ Order changed on 2026-11-15 after a review: the engine and API first (7–9), th
     - Report the counts of findings, strategies and exclusions, and the trends and outlook status.
     - _Requirements: 14.8_
 
-- [ ] 10. MODIS NDVI (NASA satellite, no login)
+- [x] 10. MODIS NDVI (NASA satellite, no login)
   - Decision 2026-11-15 (option b): last 3 complete years, prepared for demo farms by `scripts/build_ndvi.py` into `config/ndvi/<farm>.json`; `app/ndvi_store.py` looks it up.
   - [x] 10.1 Probe the ORNL DAAC MODIS web service for Webberwood: the MOD13Q1 (and MYD13Q1) date list, one subset request, speed, size and limits. Save the responses as fixtures.
   - Status 2026-11-15: 10.2–10.4 are built in the reduced "option b" form (3 complete years, precomputed per demo farm instead of 10 years fetched live with a monthly cache). Other addresses show "satellite data prepared for demo farms only".
@@ -200,7 +200,7 @@ with a layer list), fed by the /api/rotation answer through App.jsx; it is no lo
     - A text-alternative table, and an explanation when no profile is available.
     - _Requirements: 3.1–3.11_
 
-- [ ] 14. Summary sections
+- [x] 14. Summary sections
   - [x] 14.1 Create `ClimateTrends.jsx` (the Load button and wait message live in FieldSummary's outlook note)
     - One Recharts chart per indicator: yearly points, trend line, decade averages, outlook band.
     - A plain "per decade" sentence and the clear / "no clear change" chip.
