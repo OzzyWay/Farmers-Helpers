@@ -861,7 +861,7 @@ a { color: var(--accent-text); }
 .raster-panel {
   position: absolute;
   z-index: 3;
-  top: 104px;
+  top: max(120px, calc(var(--topbar-h, 84px) + var(--gap) + 8px));
   left: var(--gap);
   width: min(340px, calc(100vw - 2 * var(--gap)));
   max-height: min(62vh, 570px);
@@ -950,7 +950,6 @@ a { color: var(--accent-text); }
 .raster-summary-variable { margin-top: 7px; }
 .raster-summary-variable p { margin: 3px 0; color: var(--text-secondary); line-height: 1.45; }
 @media (max-width: 767px) {
-  .raster-panel { top: 104px; }
   .raster-panel-content { max-height: min(45vh, 430px); }
 }
 
