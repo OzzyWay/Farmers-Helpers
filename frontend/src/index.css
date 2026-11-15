@@ -1266,6 +1266,270 @@ body { background: var(--bg); line-height: 1.5; }
   .depth-steps { gap: 16vh; padding: 4vh 0 10vh; }
 }
 
+/* Reference visual layer must follow the structural full-page rules above. */
+.depth-story > .landing-inner > h2 { display: none; }
+.depth-scene {
+  background:
+    radial-gradient(circle at 15% 44%, rgb(211 158 91 / 18%) 0 1px, transparent 2px),
+    radial-gradient(circle at 72% 62%, rgb(246 202 133 / 15%) 0 1px, transparent 2px),
+    linear-gradient(#241a16 0 25%, #4e2819 25% 43.75%, #7f3f1d 43.75% 62.5%, #ba6c3d 62.5% 81.25%, #493d36 81.25%);
+  background-size: 92px 80px, 127px 94px, auto;
+}
+.depth-grass { height: 25%; border-bottom: 7px solid #30251d; background: #3f553a; }
+.depth-grass img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 78%; filter: saturate(0.72) brightness(0.63); }
+.depth-grass::after { position: absolute; inset: 44% 0 0; content: ""; background: rgb(25 34 25 / 42%); }
+.depth-title { left: 5vw; max-width: 9ch; font-size: clamp(2.2rem, 5vw, 5rem); line-height: 0.92; text-shadow: 0 3px 16px rgb(0 0 0 / 55%); }
+.depth-band { background-image: linear-gradient(90deg, rgb(255 255 255 / 6%), transparent 42%, rgb(0 0 0 / 12%)); }
+.depth-band-label { opacity: 0.18; }
+.depth-step {
+  width: min(500px, 46vw); margin-right: 6vw; padding: 44px 38px;
+  border: 1px solid rgb(184 215 111 / 72%); border-left: 6px solid #b8d76f; border-radius: 10px;
+  background: linear-gradient(145deg, rgb(66 105 37 / 98%), rgb(38 62 29 / 98%));
+  box-shadow: 0 20px 50px rgb(0 0 0 / 28%); color: #f8f3e9;
+}
+.depth-step[data-active="true"] { border-color: #b8d76f; border-left-color: #cce889; box-shadow: 0 20px 50px rgb(0 0 0 / 36%); }
+.depth-step h3 { max-width: 12ch; color: #fffaf0; font-size: clamp(2.25rem, 4vw, 3.4rem); }
+.depth-step p { color: rgb(255 250 240 / 78%); }
+.depth-step .eyebrow { color: #d2e5a8; }
+.depth-step .depth-sources { color: rgb(255 250 240 / 58%); }
+@media (max-width: 767px) {
+  .depth-step { width: min(86vw, 500px); margin-right: 7vw; padding: 30px 24px; }
+  .depth-step h3 { font-size: 2rem; }
+}
+
+/* Keep the story focused on its topic cards. The soil illustration is removed from
+   the reading flow so each topic gets a clean, full-page scroll stop. */
+.depth-story > .landing-inner > h2 {
+  display: block;
+  padding: 12px 24px 0;
+  color: #f8f3e9;
+}
+.depth-grid {
+  display: block;
+  min-height: 0;
+  overflow: visible;
+  padding: 8px 24px 96px;
+  background: #241e19;
+}
+.depth-scene { display: none; }
+#depth-story > .landing-inner > h2 { display: none; }
+#depth-story .depth-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  min-height: calc(5 * 82svh);
+  overflow: visible;
+  padding: 0;
+}
+#depth-story .depth-scene {
+  display: block;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100svh;
+  min-height: 560px;
+  border: 0;
+  border-radius: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 15% 44%, rgb(211 158 91 / 18%) 0 1px, transparent 2px),
+    radial-gradient(circle at 72% 62%, rgb(246 202 133 / 15%) 0 1px, transparent 2px),
+    linear-gradient(#241a16 0 25%, #4e2819 25% 43.75%, #7f3f1d 43.75% 62.5%, #ba6c3d 62.5% 81.25%, #493d36 81.25%);
+  background-size: 92px 80px, 127px 94px, auto;
+}
+#depth-story .depth-scene svg { width: 100%; max-width: none; height: 100%; }
+#depth-story .depth-grass { height: 25%; border-bottom: 7px solid #30251d; }
+#depth-story .depth-grass img {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  object-position: center 78%; filter: saturate(0.72) brightness(0.63);
+}
+#depth-story .depth-grass::after {
+  position: absolute; inset: 44% 0 0; content: ""; background: rgb(25 34 25 / 42%);
+}
+#depth-story .depth-title {
+  left: 5vw; max-width: 9ch; font-size: clamp(2.2rem, 5vw, 5rem);
+  line-height: 0.92; text-shadow: 0 3px 16px rgb(0 0 0 / 55%);
+}
+#depth-story .depth-steps {
+  position: relative; z-index: 6; display: flex; min-width: 0;
+  flex-direction: column; gap: 0; padding: 0; pointer-events: none;
+}
+#depth-story .depth-step {
+  width: min(500px, 46vw); min-height: 82svh; margin: 0 6vw 0 auto;
+  padding: 44px 38px; display: flex; flex-direction: column; justify-content: center;
+  pointer-events: auto; border: 1px solid rgb(184 215 111 / 34%);
+  border-left: 6px solid rgb(184 215 111 / 42%); border-radius: 10px;
+  background: linear-gradient(145deg, rgb(66 105 37 / 88%), rgb(38 62 29 / 88%));
+  box-shadow: 0 20px 50px rgb(0 0 0 / 24%); opacity: 0.18;
+  transform: translateY(14px); transition: opacity 260ms ease, transform 260ms ease, border-color 260ms ease;
+}
+#depth-story .depth-step[data-active="true"] {
+  border-color: #b8d76f; border-left-color: #cce889;
+  box-shadow: 0 20px 50px rgb(0 0 0 / 36%); opacity: 1; transform: translateY(0);
+}
+#depth-story .depth-step h3 { max-width: 12ch; color: #fffaf0; font-size: clamp(2.25rem, 4vw, 3.4rem); }
+#depth-story .depth-step p { color: rgb(255 250 240 / 78%); }
+#depth-story .depth-step .eyebrow { color: #d2e5a8; }
+#depth-story .depth-step .depth-sources { color: rgb(255 250 240 / 58%); }
+@media (max-width: 767px) {
+  #depth-story .depth-grid { min-height: calc(5 * 68svh); }
+  #depth-story .depth-scene { min-height: 420px; }
+  #depth-story .depth-step {
+    width: min(86vw, 500px);
+    min-height: 68svh;
+    margin-right: 7vw;
+    padding: 32px 24px;
+  }
+  #depth-story .depth-step h3 { font-size: 2rem; }
+}
+.depth-steps {
+  display: flex;
+  max-width: 760px;
+  margin: 0 auto;
+  gap: 28px;
+  padding: 0;
+}
+.depth-step,
+.depth-step[data-active="true"] {
+  width: 100%;
+  min-height: 0;
+  margin: 0;
+  padding: 36px 38px;
+  border: 1px solid rgb(184 215 111 / 62%);
+  border-left: 6px solid #b8d76f;
+  border-radius: 12px;
+  background: linear-gradient(145deg, rgb(66 105 37 / 98%), rgb(38 62 29 / 98%));
+  box-shadow: 0 18px 42px rgb(0 0 0 / 24%);
+  opacity: 1;
+  transform: none;
+}
+.depth-step h3 { max-width: 16ch; }
+
+@media (max-width: 767px) {
+  .depth-story > .landing-inner > h2 { padding-right: 16px; padding-left: 16px; }
+  .depth-grid { padding: 8px 16px 64px; }
+  .depth-step,
+  .depth-step[data-active="true"] { padding: 28px 24px; }
+}
+
+/* Layered scroll composition: the page moves through the cards while the soil
+   cutaway stays pinned behind the currently active topic. */
+.depth-story > .landing-inner > h2 { display: none; }
+.depth-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  min-height: calc(5 * 82svh);
+  overflow: visible;
+  padding: 0;
+  background: #241e19;
+}
+.depth-scene,
+.depth-steps { grid-area: 1 / 1; }
+.depth-scene {
+  display: block;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100svh;
+  min-height: 560px;
+  border: 0;
+  border-radius: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 15% 44%, rgb(211 158 91 / 18%) 0 1px, transparent 2px),
+    radial-gradient(circle at 72% 62%, rgb(246 202 133 / 15%) 0 1px, transparent 2px),
+    linear-gradient(#241a16 0 25%, #4e2819 25% 43.75%, #7f3f1d 43.75% 62.5%, #ba6c3d 62.5% 81.25%, #493d36 81.25%);
+  background-size: 92px 80px, 127px 94px, auto;
+}
+.depth-scene svg { width: 100%; max-width: none; height: 100%; }
+.depth-grass {
+  height: 25%;
+  border-bottom: 7px solid #30251d;
+}
+.depth-grass img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 78%;
+  filter: saturate(0.72) brightness(0.63);
+}
+.depth-grass::after {
+  position: absolute;
+  inset: 44% 0 0;
+  content: "";
+  background: rgb(25 34 25 / 42%);
+}
+.depth-title {
+  left: 5vw;
+  max-width: 9ch;
+  font-size: clamp(2.2rem, 5vw, 5rem);
+  line-height: 0.92;
+  text-shadow: 0 3px 16px rgb(0 0 0 / 55%);
+}
+.depth-band { background-image: linear-gradient(90deg, rgb(255 255 255 / 6%), transparent 42%, rgb(0 0 0 / 12%)); }
+.depth-band-label { opacity: 0.18; }
+.depth-steps {
+  position: relative;
+  z-index: 6;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+  pointer-events: none;
+}
+.depth-step {
+  width: min(500px, 46vw);
+  min-height: 82svh;
+  margin: 0 6vw 0 auto;
+  padding: 44px 38px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  pointer-events: auto;
+  border: 1px solid rgb(184 215 111 / 34%);
+  border-left: 6px solid rgb(184 215 111 / 42%);
+  border-radius: 10px;
+  background: linear-gradient(145deg, rgb(66 105 37 / 88%), rgb(38 62 29 / 88%));
+  box-shadow: 0 20px 50px rgb(0 0 0 / 24%);
+  opacity: 0.18;
+  transform: translateY(14px);
+  transition: opacity 260ms ease, transform 260ms ease, border-color 260ms ease;
+}
+.depth-step[data-active="true"] {
+  border-color: #b8d76f;
+  border-left-color: #cce889;
+  box-shadow: 0 20px 50px rgb(0 0 0 / 36%);
+  opacity: 1;
+  transform: translateY(0);
+}
+.depth-step h3 {
+  max-width: 12ch;
+  color: #fffaf0;
+  font-size: clamp(2.25rem, 4vw, 3.4rem);
+}
+.depth-step p { color: rgb(255 250 240 / 78%); }
+.depth-step .eyebrow { color: #d2e5a8; }
+.depth-step .depth-sources { color: rgb(255 250 240 / 58%); }
+
+@media (max-width: 767px) {
+  .depth-story > .landing-inner > .eyebrow { padding-top: 64px; }
+  .depth-story > .landing-inner > .landing-lede { padding-bottom: 42px; }
+  .depth-grid { min-height: calc(5 * 68svh); }
+  .depth-scene { min-height: 420px; }
+  .depth-step {
+    width: min(86vw, 500px);
+    min-height: 68svh;
+    margin-right: 7vw;
+    padding: 32px 24px;
+  }
+  .depth-step h3 { font-size: 2rem; }
+}
+
 /* ======================================================================
    Field helper: "Ask about this field" button and question panel (src/helper/FieldHelper.jsx)
    Sits bottom-right above the page; alert pop-ups stay at the top, so the two never overlap.
@@ -1427,6 +1691,89 @@ body { background: var(--bg); line-height: 1.5; }
 }
 .ndvi-cell .cal-month, .cal-cell .cal-month { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
+/* Reference composition: field photo and grass at the soil break, a large title on the
+   left, and a tall olive reading card floating over the right side of the cutaway. */
+.depth-story {
+  background: #241e19;
+  color: #f8f3e9;
+}
+.depth-story > .landing-inner > .eyebrow {
+  padding-top: 34px;
+  color: #c7d3aa;
+}
+.depth-story > .landing-inner > h2 {
+  display: none;
+}
+.depth-story > .landing-inner > .landing-lede {
+  padding-top: 12px;
+  padding-bottom: 72px;
+  color: rgb(248 243 233 / 72%);
+}
+.depth-grid {
+  min-height: calc(5 * 82svh);
+  background: #251813;
+}
+.depth-scene {
+  background:
+    radial-gradient(circle at 15% 44%, rgb(211 158 91 / 18%) 0 1px, transparent 2px),
+    radial-gradient(circle at 72% 62%, rgb(246 202 133 / 15%) 0 1px, transparent 2px),
+    linear-gradient(#241a16 0 25%, #4e2819 25% 43.75%, #7f3f1d 43.75% 62.5%, #ba6c3d 62.5% 81.25%, #493d36 81.25%);
+  background-size: 92px 80px, 127px 94px, auto;
+}
+.depth-scene::before {
+  position: absolute; z-index: 1; top: 24%; right: 8%; bottom: 0; left: 8%; content: "";
+  background:
+    linear-gradient(72deg, transparent 48%, rgb(190 126 63 / 35%) 49% 50%, transparent 51%) 4% 0 / 150px 245px,
+    linear-gradient(108deg, transparent 48%, rgb(206 147 78 / 23%) 49% 50%, transparent 51%) 78% 0 / 190px 300px,
+    linear-gradient(83deg, transparent 48%, rgb(177 122 63 / 28%) 49% 50%, transparent 51%) 30% 100% / 220px 340px;
+  opacity: 0.8; pointer-events: none;
+}
+.depth-grass {
+  height: 25%;
+  border-bottom: 7px solid #30251d;
+  background: #3f553a;
+}
+.depth-grass img {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  object-position: center 78%; filter: saturate(0.72) brightness(0.63);
+}
+.depth-grass::after {
+  position: absolute; inset: 44% 0 0; content: ""; background: rgb(25 34 25 / 42%);
+}
+.depth-grass > span { bottom: 17px; left: 5vw; font-weight: 700; }
+.depth-title {
+  left: 5vw;
+  max-width: 9ch;
+  font-size: clamp(2.2rem, 5vw, 5rem);
+  line-height: 0.92;
+  text-shadow: 0 3px 16px rgb(0 0 0 / 55%);
+}
+.depth-band { background-image: linear-gradient(90deg, rgb(255 255 255 / 6%), transparent 42%, rgb(0 0 0 / 12%)); }
+.depth-band-label { opacity: 0.18; }
+.depth-step {
+  width: min(500px, 46vw);
+  margin-right: 6vw;
+  padding: 44px 38px;
+  border: 1px solid rgb(184 215 111 / 72%);
+  border-left: 6px solid #b8d76f;
+  border-radius: 10px;
+  background: linear-gradient(145deg, rgb(66 105 37 / 98%), rgb(38 62 29 / 98%));
+  box-shadow: 0 20px 50px rgb(0 0 0 / 28%);
+  opacity: 0.36;
+}
+.depth-step[data-active="true"] { border-color: #b8d76f; border-left-color: #cce889; box-shadow: 0 20px 50px rgb(0 0 0 / 36%); }
+.depth-step h3 { max-width: 12ch; color: #fffaf0; font-size: clamp(2.25rem, 4vw, 3.4rem); }
+.depth-step p { color: rgb(255 250 240 / 78%); }
+.depth-step .eyebrow { color: #d2e5a8; }
+.depth-step .depth-sources { color: rgb(255 250 240 / 58%); }
+
+@media (max-width: 767px) {
+  .depth-story > .landing-inner > .eyebrow { padding-top: 28px; }
+  .depth-story > .landing-inner > .landing-lede { padding-bottom: 44px; }
+  .depth-step { width: min(86vw, 500px); margin-right: 7vw; padding: 30px 24px; }
+  .depth-step h3 { font-size: 2rem; }
+}
+
 /* Full-page hero descent. The soil scene stays pinned to the viewport while the cards
    travel through it, so the browser page owns the scroll instead of a nested story box. */
 .depth-story {
@@ -1483,4 +1830,49 @@ body { background: var(--bg); line-height: 1.5; }
   .depth-title { left: 7vw; font-size: 2.6rem; }
   .depth-step { width: min(86vw, 450px); min-height: 68svh; margin-right: 7vw; padding: 32px 0; }
   .depth-step h3 { font-size: 2rem; }
+}
+
+/* Keep the story focused on its topic cards. The soil illustration is removed from
+   the reading flow so each topic gets a clean, full-page scroll stop. */
+.depth-story > .landing-inner > h2 {
+  display: block;
+  padding: 12px 24px 0;
+  color: #f8f3e9;
+}
+.depth-grid {
+  display: block;
+  min-height: 0;
+  overflow: visible;
+  padding: 8px 24px 96px;
+  background: #241e19;
+}
+.depth-scene { display: none; }
+.depth-steps {
+  display: flex;
+  max-width: 760px;
+  margin: 0 auto;
+  gap: 28px;
+  padding: 0;
+}
+.depth-step,
+.depth-step[data-active="true"] {
+  width: 100%;
+  min-height: 0;
+  margin: 0;
+  padding: 36px 38px;
+  border: 1px solid rgb(184 215 111 / 62%);
+  border-left: 6px solid #b8d76f;
+  border-radius: 12px;
+  background: linear-gradient(145deg, rgb(66 105 37 / 98%), rgb(38 62 29 / 98%));
+  box-shadow: 0 18px 42px rgb(0 0 0 / 24%);
+  opacity: 1;
+  transform: none;
+}
+.depth-step h3 { max-width: 16ch; }
+
+@media (max-width: 767px) {
+  .depth-story > .landing-inner > h2 { padding-right: 16px; padding-left: 16px; }
+  .depth-grid { padding: 8px 16px 64px; }
+  .depth-step,
+  .depth-step[data-active="true"] { padding: 28px 24px; }
 }

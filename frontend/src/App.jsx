@@ -133,7 +133,7 @@ export default function App() {
       )}
 
       <header ref={topbarRef} className="topbar frosted">
-        <h2 className="topbar-title">Field Shift</h2>
+        <h2 className="topbar-title">Farmer Helper</h2>
         {farms.length > 0 && (
           <div className="demo-farms" role="group" aria-label="Demo farms">
             {farms.map((f) => (
