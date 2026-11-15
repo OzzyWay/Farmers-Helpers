@@ -75,7 +75,6 @@
 
   color-scheme: light dark;
 }
-
 @media (prefers-color-scheme: dark) {
   :root {
     --bg: #1a1b17;
@@ -1854,49 +1853,4 @@ body { background: var(--bg); line-height: 1.5; }
   .depth-title { left: 7vw; font-size: 2.6rem; }
   .depth-step { width: min(86vw, 450px); min-height: 68svh; margin-right: 7vw; padding: 32px 0; }
   .depth-step h3 { font-size: 2rem; }
-}
-
-/* Keep the story focused on its topic cards. The soil illustration is removed from
-   the reading flow so each topic gets a clean, full-page scroll stop. */
-.depth-story > .landing-inner > h2 {
-  display: block;
-  padding: 12px 24px 0;
-  color: #f8f3e9;
-}
-.depth-grid {
-  display: block;
-  min-height: 0;
-  overflow: visible;
-  padding: 8px 24px 96px;
-  background: #241e19;
-}
-.depth-scene { display: none; }
-.depth-steps {
-  display: flex;
-  max-width: 760px;
-  margin: 0 auto;
-  gap: 28px;
-  padding: 0;
-}
-.depth-step,
-.depth-step[data-active="true"] {
-  width: 100%;
-  min-height: 0;
-  margin: 0;
-  padding: 36px 38px;
-  border: 1px solid rgb(184 215 111 / 62%);
-  border-left: 6px solid #b8d76f;
-  border-radius: 12px;
-  background: linear-gradient(145deg, rgb(66 105 37 / 98%), rgb(38 62 29 / 98%));
-  box-shadow: 0 18px 42px rgb(0 0 0 / 24%);
-  opacity: 1;
-  transform: none;
-}
-.depth-step h3 { max-width: 16ch; }
-
-@media (max-width: 767px) {
-  .depth-story > .landing-inner > h2 { padding-right: 16px; padding-left: 16px; }
-  .depth-grid { padding: 8px 16px 64px; }
-  .depth-step,
-  .depth-step[data-active="true"] { padding: 28px 24px; }
 }
