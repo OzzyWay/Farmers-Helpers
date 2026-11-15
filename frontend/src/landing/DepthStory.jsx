@@ -10,6 +10,14 @@ const BANDS = [
   { id: "bedrock", fill: "#6b6a64", y: 410, h: 110 },
 ];
 
+const GRASS_COLORS = ["#8fc63d", "#64a82f", "#b1dc55", "#4c8d2d", "#d0eb72"];
+const GRASS_BLADES = Array.from({ length: 44 }, (_, index) => ({
+  x: (index / 43) * 100 + ((index * 17) % 7) - 3.5,
+  height: 26 + ((index * 29) % 50),
+  lean: ((index * 23) % 17) - 8,
+  color: GRASS_COLORS[index % GRASS_COLORS.length],
+}));
+
 /**
  * "Below the grass line": a sticky drawing of the soil layers beside five steps.
  * The step crossing the middle of the screen is highlighted, with its layer in the drawing.
@@ -18,6 +26,7 @@ const BANDS = [
 export default function DepthStory() {
   const [active, setActive] = useState(depthSteps[0].id);
   const stepRefs = useRef([]);
+  const sceneRef = useRef(null);
 
   useEffect(() => {
     if (typeof IntersectionObserver === "undefined") return undefined; // step one stays highlighted
@@ -31,6 +40,58 @@ export default function DepthStory() {
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    const scene = sceneRef.current;
+    if (!scene) return undefined;
+
+    const updateDepth = () => {
+      const viewportCenter = window.innerHeight * 0.52;
+      const centers = stepRefs.current
+        .filter(Boolean)
+        .map((step) => ({ step, center: step.getBoundingClientRect().top + step.getBoundingClientRect().height / 2 }));
+      if (!centers.length) return;
+
+      const first = centers[0].center;
+      const last = centers[centers.length - 1].center;
+      const progress = Math.max(0, Math.min(1, (viewportCenter - first) / Math.max(1, last - first)));
+      scene.style.setProperty("--depth-progress", progress.toFixed(4));
+      scene.style.setProperty("--depth-title-top", `${(6 + progress * 78).toFixed(2)}%`);
+
+      const nearest = centers.reduce((current, candidate) => (
+        Math.abs(candidate.center - viewportCenter) < Math.abs(current.center - viewportCenter) ? candidate : current
+      ));
+      setActive(nearest.step.dataset.step);
+    };
+
+    const onPointerMove = (event) => {
+      const bounds = scene.getBoundingClientRect();
+      const hoverX = Math.max(0, Math.min(100, ((event.clientX - bounds.left) / bounds.width) * 100));
+      scene.style.setProperty("--hover-x", `${hoverX.toFixed(1)}%`);
+      scene.querySelectorAll(".grass-blade").forEach((blade) => {
+        const bladeX = Number(blade.dataset.x);
+        const influence = Math.max(0, 1 - Math.abs(hoverX - bladeX) / 24);
+        const bendAway = hoverX > bladeX ? -18 * influence : 18 * influence;
+        blade.style.transform = `rotate(${Number(blade.dataset.lean) + bendAway}deg)`;
+      });
+    };
+    const resetGrass = () => {
+      scene.style.removeProperty("--hover-x");
+      scene.querySelectorAll(".grass-blade").forEach((blade) => { blade.style.transform = ""; });
+    };
+
+    window.addEventListener("scroll", updateDepth, { passive: true });
+    window.addEventListener("resize", updateDepth);
+    scene.addEventListener("pointermove", onPointerMove);
+    scene.addEventListener("pointerleave", resetGrass);
+    updateDepth();
+    return () => {
+      window.removeEventListener("scroll", updateDepth);
+      window.removeEventListener("resize", updateDepth);
+      scene.removeEventListener("pointermove", onPointerMove);
+      scene.removeEventListener("pointerleave", resetGrass);
+    };
+  }, []);
+
   const label = (id) => depthSteps.find((s) => s.id === id)?.band || id;
 
   return (
@@ -41,7 +102,27 @@ export default function DepthStory() {
         <p className="landing-lede">{depthStory.lede}</p>
 
         <div className="depth-grid">
-          <div className="depth-scene" data-active-step={active} aria-hidden="true">
+          <div ref={sceneRef} className="depth-scene" data-active-step={active} aria-hidden="true">
+            <div className="depth-title">Field Shift</div>
+            <div className="depth-grass">
+              <span>GRASS LINE</span>
+              <div className="grass-field">
+                {GRASS_BLADES.map((blade, index) => (
+                  <i
+                    key={index}
+                    className="grass-blade"
+                    data-x={blade.x}
+                    data-lean={blade.lean}
+                    style={{
+                      "--x": `${blade.x}%`,
+                      "--height": `${blade.height}%`,
+                      "--lean": `${blade.lean}deg`,
+                      "--grass-color": blade.color,
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
             <svg viewBox="0 0 400 520" role="presentation">
               {BANDS.map((b) => (
                 <g key={b.id}>
