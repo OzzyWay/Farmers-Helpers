@@ -1391,6 +1391,7 @@ body { background: var(--bg); line-height: 1.5; }
 #depth-story .depth-step h3 { max-width: 12ch; color: #fffaf0; font-size: clamp(2.25rem, 4vw, 3.4rem); }
 #depth-story .depth-step p { color: rgb(255 250 240 / 78%); }
 #depth-story .depth-step .eyebrow { color: #d2e5a8; }
+#depth-story .depth-step > .eyebrow { display: none; }
 #depth-story .depth-step .depth-sources { color: rgb(255 250 240 / 58%); }
 @media (max-width: 767px) {
   #depth-story .depth-grid { min-height: calc(5 * 68svh); }
