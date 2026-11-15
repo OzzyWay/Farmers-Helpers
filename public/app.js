@@ -26,8 +26,6 @@ function initTexasDesk() {
   regionMarkers = L.layerGroup().addTo(texasMap);
   const gpsLayer = L.layerGroup().addTo(texasMap);
   const depthScene = $("#depth-scene");
-  const hero = $(".landing-hero");
-  const heroSun = $(".hero-sun");
   const depthLabel = $("#depth-label");
   const depthSteps = [...document.querySelectorAll(".depth-step")];
   const grassColors = ["#8fc63d", "#64a82f", "#b1dc55", "#4c8d2d", "#d0eb72"];
@@ -83,9 +81,6 @@ function initTexasDesk() {
     displayedProgress += (targetProgress - displayedProgress) * 0.14;
     depthScene.style.setProperty("--depth-progress", displayedProgress.toFixed(4));
     depthScene.style.setProperty("--depth-title-top", `${(6 + displayedProgress * 78).toFixed(2)}%`);
-    // The sun starts in the hero and sets toward the horizon as the soil story
-    // advances. It fades before the soil scene can cover the hero layer.
-    hero.style.setProperty("--sun-progress", displayedProgress.toFixed(4));
     if (Math.abs(targetProgress - displayedProgress) > 0.001) {
       depthFrame = requestAnimationFrame(animateDepth);
     } else {

@@ -214,30 +214,7 @@ body { background: var(--bg); color: var(--ink); }
 .landing-hero { position: relative; min-height: 690px; height: 77svh; max-height: 900px; overflow: hidden; background: #28372d; color: white; }
 .hero-image, .hero-shade { position: absolute; inset: 0; width: 100%; height: 100%; }
 .hero-image { object-fit: cover; object-position: center 54%; }
-.hero-shade { background: rgba(18, 27, 21, calc(0.28 + var(--sun-progress, 0) * 0.48)); transition: background 260ms ease; }
-.hero-sun {
-  position: fixed;
-  z-index: 2;
-  top: calc(15vh + var(--sun-progress, 0) * 48vh);
-  right: 13vw;
-  width: clamp(72px, 10vw, 148px);
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: radial-gradient(circle, #fff9c8 0 9%, #ffd66b 23%, rgba(244, 153, 50, 0.56) 44%, transparent 72%);
-  box-shadow: 0 0 42px 18px rgba(255, 185, 72, 0.2);
-  opacity: max(0, calc(1 - var(--sun-progress, 0) * 1.15));
-  transform: translateY(-50%);
-  transition: top 100ms linear, opacity 260ms ease;
-  pointer-events: none;
-}
-.hero-sun::after {
-  position: absolute;
-  inset: -35%;
-  border: 1px solid rgba(255, 217, 123, 0.42);
-  border-radius: 50%;
-  content: "";
-  animation: sun-pulse 3.6s ease-in-out infinite;
-}
+.hero-shade { background: rgba(18, 27, 21, 0.28); }
 .hero-copy { position: relative; z-index: 1; display: flex; min-height: 100%; max-width: 1180px; margin: auto; padding: 110px 24px 100px; flex-direction: column; align-items: flex-start; justify-content: center; }
 .hero-kicker, .eyebrow { color: var(--soil); font-size: 0.69rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; }
 .hero-kicker { display: flex; align-items: center; gap: 9px; margin: 0 0 20px; color: #e8e1d3; }
@@ -1158,7 +1135,6 @@ body { background: var(--bg); color: var(--ink); }
 }
 @media (prefers-reduced-motion: reduce) {
   .grass-blade { transition: none; }
-  .hero-sun::after { animation: none; }
 }
 @keyframes sun-pulse {
   0%, 100% { transform: scale(0.96); opacity: 0.45; }
@@ -1338,33 +1314,3 @@ body { background: var(--bg); color: var(--ink); }
 #desk .region-panel .region-action:focus-visible { outline-color: #385943; }
 #desk #report { color: #22231f; }
 
-@media (prefers-reduced-motion: reduce) {
-  .hero-sun, .hero-shade, .depth-title, .grass-blade, .spinner { animation: none !important; transition: none !important; }
-}
-
-/* Sunset: mute the source image's bright spot and let the custom sun settle behind the grass line. */
-.landing-hero .hero-image {
-  filter: brightness(0.72) saturate(0.78);
-}
-.landing-hero .hero-shade {
-  background:
-    linear-gradient(90deg, transparent 0 55%, rgba(22, 31, 24, 0.42) 69%, rgba(22, 31, 24, 0.72) 100%),
-    linear-gradient(180deg, rgba(14, 24, 18, 0.4), rgba(18, 27, 21, 0.08) 42%, rgba(18, 27, 21, 0.66) 100%);
-}
-.landing-hero .hero-shade::before {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse at 77% 51%, rgba(24, 34, 26, 0.94) 0 9%, rgba(24, 34, 26, 0.62) 17%, transparent 32%);
-  content: "";
-  pointer-events: none;
-}
-.landing-hero .hero-sun {
-  z-index: 1;
-  top: calc(72vh + var(--sun-progress, 0) * 16vh);
-  right: 18vw;
-  width: clamp(52px, 7vw, 96px);
-  opacity: max(0, calc(1 - var(--sun-progress, 0) * 1.15));
-  background: radial-gradient(circle, #ffe9a0 0 28%, #e9ad4f 62%, rgba(197, 115, 43, 0.42) 78%, transparent 79%);
-  box-shadow: none;
-}
-.landing-hero .hero-sun::after { display: none; }
