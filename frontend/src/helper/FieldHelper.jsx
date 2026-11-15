@@ -289,7 +289,7 @@ export default function FieldHelper({ place, rotation, weather }) {
           <header className="helper-head">
             <div>
               <h2 id={`${id}-title`} ref={headingRef} tabIndex={-1} className="helper-title">Ask about this field</h2>
-              <p className="helper-sub">{place.label} · answers from a Google search for this spot</p>
+              <p className="helper-sub">{place.label}</p>
             </div>
             <button type="button" className="helper-close" onClick={close} aria-label="Close chat">✕</button>
           </header>
@@ -302,10 +302,7 @@ export default function FieldHelper({ place, rotation, weather }) {
             )}
 
             {!started && (
-              <div className="chat-welcome">
-                <p className="chat-hello">Hi! Ask me anything about farming this spot.</p>
-                <p className="helper-hint">Tap a question below to start, or type your own in plain words. There are no wrong questions.</p>
-              </div>
+              <p className="helper-hint">Tap a question below, or type your own.</p>
             )}
 
             <div role="log" aria-live="polite" aria-relevant="additions" className="helper-log">
