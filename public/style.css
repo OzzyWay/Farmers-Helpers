@@ -1341,3 +1341,22 @@ body { background: var(--bg); color: var(--ink); }
 @media (prefers-reduced-motion: reduce) {
   .hero-sun, .hero-shade, .depth-title, .grass-blade, .spinner { animation: none !important; transition: none !important; }
 }
+
+/* Sunset: mute the source image's bright spot and let the custom sun settle behind the grass line. */
+.landing-hero .hero-image {
+  filter: brightness(0.72) saturate(0.78);
+}
+.landing-hero .hero-shade {
+  background:
+    radial-gradient(circle at 78% 23%, rgba(19, 29, 20, 0.64) 0 7%, transparent 19%),
+    linear-gradient(180deg, rgba(14, 24, 18, 0.4), rgba(18, 27, 21, 0.08) 42%, rgba(18, 27, 21, 0.58) 100%);
+}
+.landing-hero .hero-sun {
+  z-index: 1;
+  top: calc(58vh + var(--sun-progress, 0) * 24vh);
+  right: 18vw;
+  width: clamp(64px, 9vw, 132px);
+  opacity: max(0, calc(1 - var(--sun-progress, 0) * 1.15));
+  background: radial-gradient(circle, #fff5b2 0 8%, #f5c65f 24%, rgba(228, 133, 47, 0.6) 44%, transparent 72%);
+  box-shadow: 0 0 36px 15px rgba(255, 175, 62, 0.18);
+}
