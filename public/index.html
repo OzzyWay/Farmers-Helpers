@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="style.css?v=14">
 </head>
 <body>
+  <div class="alerts" id="alerts" role="region" aria-label="Weather alerts" aria-live="polite"></div>
   <a class="skip-link" href="#landing">Skip to main content</a>
   <header class="top">
     <div class="wrap top-inner">
@@ -156,6 +157,16 @@
         <p class="muted small" id="place-coords"></p>
       </div>
       <div class="stats" id="stats"></div>
+      <section class="card" id="forecast-card" hidden>
+        <div class="card-head">
+          <h3>Next 7 days</h3>
+          <div class="forecast-actions">
+            <button type="button" class="link-btn" id="show-alerts" hidden></button>
+            <a class="small" id="forecast-link" target="_blank" rel="noopener">National Weather Service forecast ↗</a>
+          </div>
+        </div>
+        <div class="forecast" id="forecast"></div>
+      </section>
       <div class="grid-2">
         <section class="card map-card">
           <div class="card-head"><h3>Your area</h3><span class="muted small">Switch layers with the stack icon on the map</span></div>
